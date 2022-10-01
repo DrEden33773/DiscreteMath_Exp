@@ -11,6 +11,8 @@
 
 #include <bits/stdc++.h>
 
+namespace Tool {
+
 template <typename T = int> // default type is int
 class Matrix {
 private:
@@ -59,6 +61,21 @@ private:
     Matrix() = default; // only used while creating a zero mat
 
 public:
+    static bool ifEmpty(const Matrix& input) {
+        return input.SizeOf_Column == 0 || input.SizeOf_Row == 0;
+    }
+    static bool ifZero(const Matrix& input) {
+    }
+    static bool addable_with(const Matrix& A, const Matrix& B) {
+        bool if_same_row    = A.SizeOf_Row == B.SizeOf_Row;
+        bool if_same_column = A.SizeOf_Column == B.SizeOf_Column;
+        return if_same_column && if_same_row;
+    }
+    static bool multipliable_with(const Matrix& A, const Matrix& B) {
+        bool if_col_eq_row = A.SizeOf_Column == B.SizeOf_Row;
+        return if_col_eq_row;
+    }
+
     Matrix(std::initializer_list<
            std::initializer_list<T>>&& initMat) {
         // 1. assertion
@@ -106,3 +123,5 @@ public:
         return ZeroMat;
     }
 };
+
+} // namespace Tool
