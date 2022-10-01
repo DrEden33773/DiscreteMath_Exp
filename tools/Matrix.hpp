@@ -56,7 +56,7 @@ private:
         }
         return ifOK;
     }
-    Matrix() = default; // only used while creating a zero
+    Matrix() = default; // only used while creating a zero mat
 
 public:
     Matrix(std::initializer_list<
