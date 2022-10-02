@@ -9,11 +9,26 @@
  *
  */
 
+#pragma once
 #include <bits/stdc++.h>
 
 namespace Tool {
 
+template <typename T>
+concept arithmetic = std::is_arithmetic<T>::value;
+
+template <typename T>
+concept notChar = !(
+    std::is_same<T, char>::value
+    || std::is_same<T, char&>::value
+    || std::is_same<T, char*>::value
+    || std::is_same<T, const char>::value
+    || std::is_same<T, const char*>::value
+    || std::is_same<T, const char&>::value
+);
+
 template <typename T = int> // default type is int
+requires arithmetic<T> && notChar<T>
 class Matrix {
 private:
     std::vector<std::vector<T>> Data;
@@ -110,11 +125,25 @@ public:
         bool if_same_type  = Matrix::if_same_type(A, B);
         return if_col_eq_row && if_same_type;
     }
+    static constexpr bool subable(Matrix& A, Matrix& B) {
+        bool if_addable = addable(A, B);
+        return true;
+    }
+
     static Matrix CreateZeroMat(size_t& row, size_t& column) {
         Matrix ZeroMat;
         ZeroMat.buildZeroMat(row, column);
         return ZeroMat;
     }
+    static Matrix CreateIdentityMat(size_t& row, size_t& column) {
+        Matrix IdentityMat;
+        IdentityMat.buildZeroMat(row, column);
+        for (int row = 0; row < IdentityMat.SizeOf_Row; ++row) {
+            IdentityMat(row, row) = 1;
+        }
+        return IdentityMat;
+    }
+
     static constexpr Matrix A_add_B(Matrix& A, Matrix& B) {
         if (!Matrix::addable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
@@ -173,6 +202,23 @@ public:
 
         return res;
     }
+    static constexpr Matrix A_q_pow_N(Matrix& A, size_t N) {
+        if (!Matrix::multipliable(A, A)) {
+            throw std::logic_error("Matrix {A} and {A} is not multipliable!");
+        }
+        Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateIdentityMat(
+            A.SizeOf_Row,
+            A.SizeOf_Column
+        );
+        while (N) {
+            if (N & 1) {
+                res *= A;
+            }
+            A *= A;
+            N >>= 1;
+        }
+        return res;
+    }
 
     Matrix(std::initializer_list<
            std::initializer_list<T>>&& initMat) {
@@ -216,7 +262,7 @@ public:
     }
     ~Matrix() = default;
 
-    T& operator()(const size_t& row, const size_t& col) {
+    constexpr T& operator()(const size_t& row, const size_t& col) {
         if (row > SizeOf_Row || col > SizeOf_Column) {
             throw std::out_of_range("input {row} or {col} is out of range!");
         }
@@ -233,6 +279,9 @@ public:
     }
     friend constexpr Matrix operator*(Matrix& A, Matrix& B) {
         return Matrix::A_multiply_B(A, B);
+    }
+    friend constexpr Matrix operator^(Matrix& A, size_t N) {
+        Matrix::A_q_pow_N(A, N);
     }
 };
 
