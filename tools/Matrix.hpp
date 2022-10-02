@@ -19,10 +19,13 @@ private:
     std::vector<std::vector<T>> Data;
     std::vector<T>              RowCache;
 
+    T      TypeIdentifier;
     size_t SizeOf_Row    = 0;
     size_t SizeOf_Column = 0;
 
-    void buildZeroMat(const size_t& row, const size_t& column) {
+    void buildZeroMat(size_t& row, size_t& column) {
+        SizeOf_Row    = row;
+        SizeOf_Column = column;
         Data.reserve(row);
         for (int i = 0; i < row; ++i) {
             Data.emplace_back(RowCache);
@@ -61,19 +64,89 @@ private:
     Matrix() = default; // only used while creating a zero mat
 
 public:
-    static bool ifEmpty(const Matrix& input) {
+    static bool ifEmpty(Matrix& input) {
         return input.SizeOf_Column == 0 || input.SizeOf_Row == 0;
     }
-    static bool ifZero(const Matrix& input) {
+    static bool ifZero(Matrix& input) {
+        assert(!ifEmpty(input));
+        bool res = true;
+        for (auto& currRow : input) {
+            for (auto& currElem : currRow) {
+                if (currElem == 0) {
+                    res = false;
+                    break;
+                }
+            }
+        }
+        return res;
     }
-    static bool addable_with(const Matrix& A, const Matrix& B) {
+    static bool if_same_type(Matrix& A, Matrix& B) {
+        using TypeA = decltype(A.TypeIdentifier);
+        using TypeB = decltype(B.TypeIdentifier);
+        return std::is_same<TypeA, TypeB>::value;
+    }
+    static bool addable(Matrix& A, Matrix& B) {
         bool if_same_row    = A.SizeOf_Row == B.SizeOf_Row;
         bool if_same_column = A.SizeOf_Column == B.SizeOf_Column;
-        return if_same_column && if_same_row;
+        bool if_same_type   = Matrix::if_same_type(A, B);
+        return if_same_column && if_same_row && if_same_type;
     }
-    static bool multipliable_with(const Matrix& A, const Matrix& B) {
+    static bool multipliable(Matrix& A, Matrix& B) {
         bool if_col_eq_row = A.SizeOf_Column == B.SizeOf_Row;
-        return if_col_eq_row;
+        bool if_same_type  = Matrix::if_same_type(A, B);
+        return if_col_eq_row && if_same_type;
+    }
+    static Matrix CreateZeroMat(size_t& row, size_t& column) {
+        Matrix ZeroMat;
+        ZeroMat.buildZeroMat(row, column);
+        return ZeroMat;
+    }
+    static Matrix A_add_B(Matrix& A, Matrix& B) {
+        if (!Matrix::addable(A, B)) {
+            throw std::logic_error("Matrix {A} and {B} is not addable!");
+        }
+        Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateZeroMat(
+            A.SizeOf_Row,
+            A.SizeOf_Column
+        );
+        for (int row = 0; row < A.SizeOf_Row; ++row) {
+            for (int col = 0; row < A.SizeOf_Column; ++col) {
+                res(row, col) = A(row, col) + B(row, col);
+            }
+        }
+        return res;
+    }
+    static Matrix A_sub_B(Matrix& A, Matrix& B) {
+        if (!Matrix::addable(A, B)) {
+            throw std::logic_error("Matrix {A} and {B} is not addable!");
+        }
+        Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateZeroMat(
+            A.SizeOf_Row,
+            A.SizeOf_Column
+        );
+        for (int row = 0; row < A.SizeOf_Row; ++row) {
+            for (int col = 0; row < A.SizeOf_Column; ++col) {
+                res(row, col) = A(row, col) - B(row, col);
+            }
+        }
+        return res;
+    }
+    static Matrix A_multiply_B(Matrix& A, Matrix& B) {
+        if (!Matrix::multipliable(A, B)) {
+            throw std::logic_error("Matrix {A} and {B} is not multipliable!");
+        }
+        Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateZeroMat(
+            A.SizeOf_Row,
+            B.SizeOf_Column
+        );
+        for (int row = 0; row < A.SizeOf_Row; ++row) {
+            for (int col = 0; col < B.SizeOf_Column; ++col) {
+                for (int k = 0; k < A.SizeOf_Column; ++k) {
+                    res(row, col) = A(row, k) * B(k, col);
+                }
+            }
+        }
+        return res;
     }
 
     Matrix(std::initializer_list<
@@ -116,11 +189,25 @@ public:
             ++currRow;
         }
     }
+    ~Matrix() = default;
 
-    static Matrix& CreateZeroMat(const size_t& row, const size_t& column) {
-        Matrix ZeroMat;
-        ZeroMat.buildZeroMat(row, column);
-        return ZeroMat;
+    T& operator()(const size_t& row, const size_t& col) {
+        if (row > SizeOf_Row || col > SizeOf_Column) {
+            throw std::out_of_range("input {row} or {col} is out of range!");
+        }
+        if (Matrix::ifEmpty(*this)) {
+            throw std::logic_error("{this} matrix is empty!");
+        }
+        return Data[row][col];
+    }
+    friend Matrix operator+(Matrix& A, Matrix& B) {
+        return Matrix::A_add_B(A, B);
+    }
+    friend Matrix operator-(Matrix& A, Matrix& B) {
+        return Matrix::A_sub_B(A, B);
+    }
+    friend Matrix operator*(Matrix& A, Matrix& B) {
+        return Matrix::A_multiply_B(A, B);
     }
 };
 
