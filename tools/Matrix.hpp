@@ -115,7 +115,7 @@ public:
         ZeroMat.buildZeroMat(row, column);
         return ZeroMat;
     }
-    static Matrix A_add_B(Matrix& A, Matrix& B) {
+    static constexpr Matrix A_add_B(Matrix& A, Matrix& B) {
         if (!Matrix::addable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
         }
@@ -130,7 +130,7 @@ public:
         }
         return res;
     }
-    static Matrix A_sub_B(Matrix& A, Matrix& B) {
+    static constexpr Matrix A_sub_B(Matrix& A, Matrix& B) {
         if (!Matrix::addable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
         }
@@ -145,7 +145,7 @@ public:
         }
         return res;
     }
-    static Matrix A_multiply_B(Matrix& A, Matrix& B) {
+    static constexpr Matrix A_multiply_B(Matrix& A, Matrix& B) {
         if (!Matrix::multipliable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not multipliable!");
         }
@@ -214,13 +214,13 @@ public:
         }
         return Data[row][col];
     }
-    friend Matrix operator+(Matrix& A, Matrix& B) {
+    friend constexpr Matrix operator+(Matrix& A, Matrix& B) {
         return Matrix::A_add_B(A, B);
     }
-    friend Matrix operator-(Matrix& A, Matrix& B) {
+    friend constexpr Matrix operator-(Matrix& A, Matrix& B) {
         return Matrix::A_sub_B(A, B);
     }
-    friend Matrix operator*(Matrix& A, Matrix& B) {
+    friend constexpr Matrix operator*(Matrix& A, Matrix& B) {
         return Matrix::A_multiply_B(A, B);
     }
 };
