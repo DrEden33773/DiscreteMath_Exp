@@ -127,7 +127,24 @@ public:
     }
     static constexpr bool subable(Matrix& A, Matrix& B) {
         bool if_addable = addable(A, B);
-        return true;
+        bool if_unsigned_short
+            = std::is_same<decltype(A.TypeIdentifier), unsigned short>::value;
+        bool if_unsigned_int
+            = std::is_same<decltype(A.TypeIdentifier), unsigned int>::value;
+        bool if_unsigned_long
+            = std::is_same<decltype(A.TypeIdentifier), unsigned long>::value;
+        bool if_unsigned_long_long
+            = std::is_same<decltype(A.TypeIdentifier), unsigned long long>::value;
+        return if_addable
+            && !if_unsigned_short
+            && !if_unsigned_int
+            && !if_unsigned_long
+            && !if_unsigned_long_long;
+    }
+    static constexpr bool eqable(Matrix& A, Matrix& B) {
+        bool if_same_row = A.SizeOf_Row == B.SizeOf_Row;
+        bool if_same_col = A.SizeOf_Column == B.SizeOf_Column;
+        return if_same_row && if_same_col;
     }
 
     static Matrix CreateZeroMat(size_t& row, size_t& column) {
@@ -138,7 +155,7 @@ public:
     static Matrix CreateIdentityMat(size_t& row, size_t& column) {
         Matrix IdentityMat;
         IdentityMat.buildZeroMat(row, column);
-        for (int row = 0; row < IdentityMat.SizeOf_Row; ++row) {
+        for (int row = 1; row <= IdentityMat.SizeOf_Row; ++row) {
             IdentityMat(row, row) = 1;
         }
         return IdentityMat;
@@ -152,23 +169,23 @@ public:
             A.SizeOf_Row,
             A.SizeOf_Column
         );
-        for (int row = 0; row < A.SizeOf_Row; ++row) {
-            for (int col = 0; row < A.SizeOf_Column; ++col) {
+        for (int row = 1; row <= A.SizeOf_Row; ++row) {
+            for (int col = 1; col <= A.SizeOf_Column; ++col) {
                 res(row, col) = A(row, col) + B(row, col);
             }
         }
         return res;
     }
     static constexpr Matrix A_sub_B(Matrix& A, Matrix& B) {
-        if (!Matrix::addable(A, B)) {
+        if (!Matrix::subable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
         }
         Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateZeroMat(
             A.SizeOf_Row,
             A.SizeOf_Column
         );
-        for (int row = 0; row < A.SizeOf_Row; ++row) {
-            for (int col = 0; row < A.SizeOf_Column; ++col) {
+        for (int row = 1; row <= A.SizeOf_Row; ++row) {
+            for (int col = 1; col <= A.SizeOf_Column; ++col) {
                 res(row, col) = A(row, col) - B(row, col);
             }
         }
@@ -183,18 +200,18 @@ public:
             B.SizeOf_Column
         );
 
-        // for (int row = 0; row < A.SizeOf_Row; ++row) { // slow
-        //     for (int col = 0; col < B.SizeOf_Column; ++col) {
-        //         for (int cross = 0; cross < A.SizeOf_Column; ++cross) {
+        // for (int row = 1; row <= A.SizeOf_Row; ++row) { // slow
+        //     for (int col = 1; col <= B.SizeOf_Column; ++col) {
+        //         for (int cross = 1; cross <= A.SizeOf_Column; ++cross) {
         //             res(row, col) += A(row, cross) * B(cross, col);
         //         }
         //     }
         // }
 
-        for (int row = 0; row < A.SizeOf_Row; ++row) { // a little bit faster
-            for (int cross = 0; cross < A.SizeOf_Column; ++cross) {
+        for (int row = 1; row <= A.SizeOf_Row; ++row) { // a little bit faster
+            for (int cross = 1; cross <= A.SizeOf_Column; ++cross) {
                 auto& tmp = A(row, cross);
-                for (int col = 0; col < B.SizeOf_Column; ++col) {
+                for (int col = 1; col <= B.SizeOf_Column; ++col) {
                     res(row, col) += tmp * B(cross, col);
                 }
             }
@@ -202,7 +219,7 @@ public:
 
         return res;
     }
-    static constexpr Matrix A_q_pow_N(Matrix& A, size_t N) {
+    static constexpr Matrix A_q_pow_N(Matrix A, size_t N) { // A should not be changed
         if (!Matrix::multipliable(A, A)) {
             throw std::logic_error("Matrix {A} and {A} is not multipliable!");
         }
@@ -219,6 +236,22 @@ public:
         }
         return res;
     }
+    static constexpr Matrix A_eq_B(Matrix& A, Matrix& B) {
+        if (!Matrix::eqable(A, B)) {
+            throw std::logic_error("Matrix {A} and {B} is not eqable!");
+        }
+        Matrix<decltype(A.TypeIdentifier)> res = Matrix::CreateZeroMat(
+            A.SizeOf_Row,
+            A.SizeOf_Column
+        );
+        for (int row = 1; row <= A.SizeOf_Row; ++row) {
+            for (int col = 1; col <= A.SizeOf_Column; ++col) {
+                A(row, col)   = B(row, col);
+                res(row, col) = B(row, col);
+            }
+        }
+        return res;
+    }
 
     Matrix(std::initializer_list<
            std::initializer_list<T>>&& initMat) {
@@ -230,14 +263,14 @@ public:
         SizeOf_Column = initMat.begin()->size();
         buildZeroMat(SizeOf_Row, SizeOf_Column);
         // 3. write to matrix
-        unsigned short currRow = 0;
+        unsigned short currRowNum = 0;
         for (auto& initRow : initMat) {
-            unsigned short currCol = 0;
+            unsigned short currColNum = 0;
             for (auto& initNum : initRow) {
-                Data[currRow][currCol] = initNum;
-                ++currCol;
+                Data[currRowNum][currColNum] = initNum;
+                ++currColNum;
             }
-            ++currRow;
+            ++currRowNum;
         }
     }
     explicit Matrix(std::vector<
@@ -250,26 +283,44 @@ public:
         SizeOf_Column = initMat.begin()->size();
         buildZeroMat(SizeOf_Row, SizeOf_Column);
         // 3. write to matrix
-        unsigned short currRow = 0;
+        unsigned short currRowNum = 0;
         for (auto& initRow : initMat) {
-            unsigned short currCol = 0;
+            unsigned short currColNum = 0;
             for (auto& initNum : initRow) {
-                Data[currRow][currCol] = initNum;
-                ++currCol;
+                Data[currRowNum][currColNum] = initNum;
+                ++currColNum;
             }
-            ++currRow;
+            ++currRowNum;
         }
     }
+
+    void echo() {
+        for (auto& currRow : Data) {
+            for (auto& currElem : currRow) {
+                std::cout << currElem << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
     ~Matrix() = default;
 
+    /// @brief row, col => start from `1`
+    /// @param row
+    /// @param col
+    /// @return
     constexpr T& operator()(const size_t& row, const size_t& col) {
-        if (row > SizeOf_Row || col > SizeOf_Column) {
+        if (row > SizeOf_Row
+            || col > SizeOf_Column
+            || row < 1
+            || col < 1) {
             throw std::out_of_range("input {row} or {col} is out of range!");
         }
         if (Matrix::ifEmpty(*this)) {
             throw std::logic_error("{this} matrix is empty!");
         }
-        return Data[row][col];
+        return Data[row - 1][col - 1]; // remember to sub 1
     }
     friend constexpr Matrix operator+(Matrix& A, Matrix& B) {
         return Matrix::A_add_B(A, B);
@@ -281,7 +332,26 @@ public:
         return Matrix::A_multiply_B(A, B);
     }
     friend constexpr Matrix operator^(Matrix& A, size_t N) {
-        Matrix::A_q_pow_N(A, N);
+        return Matrix::A_q_pow_N(A, N);
+    }
+    constexpr Matrix operator=(Matrix& B) {
+        return Matrix::A_eq_B(*this, B);
+    }
+    friend constexpr Matrix operator+=(Matrix& A, Matrix& B) {
+        auto added = Matrix::A_add_B(A, B);
+        return Matrix::A_eq_B(A, added);
+    }
+    friend constexpr Matrix operator-=(Matrix& A, Matrix& B) {
+        auto subbed = Matrix::A_sub_B(A, B);
+        return Matrix::A_eq_B(A, subbed);
+    }
+    friend constexpr Matrix operator*=(Matrix& A, Matrix& B) {
+        auto multiplied = Matrix::A_multiply_B(A, B);
+        return Matrix::A_eq_B(A, multiplied);
+    }
+    friend constexpr Matrix operator^=(Matrix& A, size_t N) {
+        auto powered = Matrix::A_q_pow_N(A, N);
+        return Matrix::A_eq_B(A, powered);
     }
 };
 
