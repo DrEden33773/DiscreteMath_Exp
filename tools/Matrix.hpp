@@ -153,13 +153,24 @@ public:
             A.SizeOf_Row,
             B.SizeOf_Column
         );
-        for (int row = 0; row < A.SizeOf_Row; ++row) {
-            for (int col = 0; col < B.SizeOf_Column; ++col) {
-                for (int k = 0; k < A.SizeOf_Column; ++k) {
-                    res(row, col) = A(row, k) * B(k, col);
+
+        // for (int row = 0; row < A.SizeOf_Row; ++row) { // slow
+        //     for (int col = 0; col < B.SizeOf_Column; ++col) {
+        //         for (int cross = 0; cross < A.SizeOf_Column; ++cross) {
+        //             res(row, col) += A(row, cross) * B(cross, col);
+        //         }
+        //     }
+        // }
+
+        for (int row = 0; row < A.SizeOf_Row; ++row) { // a little bit faster
+            for (int cross = 0; cross < A.SizeOf_Column; ++cross) {
+                auto& tmp = A(row, cross);
+                for (int col = 0; col < B.SizeOf_Column; ++col) {
+                    res(row, col) += tmp * B(cross, col);
                 }
             }
-        }
+        } // https://zhuanlan.zhihu.com/p/146250334
+
         return res;
     }
 
