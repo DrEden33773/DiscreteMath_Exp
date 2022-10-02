@@ -219,6 +219,21 @@ public:
 
         return res;
     }
+    static constexpr Matrix A_multiply_B(Matrix& A, arithmetic auto B) {
+        assert(!ifEmpty(A));
+
+        using NewType       = decltype(B);
+        Matrix<NewType> res = Matrix::CreateZeroMat(
+            A.SizeOf_Row,
+            A.SizeOf_Column
+        );
+        for (int row = 1; row <= A.SizeOf_Row; ++row) {
+            for (int col = 1; col <= A.SizeOf_Column; ++col) {
+                res(row, col) = static_cast<NewType>(A(row, col)) * B;
+            }
+        }
+        return res;
+    }
     static constexpr Matrix A_q_pow_N(Matrix A, size_t N) { // A should not be changed
         if (!Matrix::multipliable(A, A)) {
             throw std::logic_error("Matrix {A} and {A} is not multipliable!");
@@ -253,8 +268,7 @@ public:
         return res;
     }
 
-    Matrix(std::initializer_list<
-           std::initializer_list<T>>&& initMat) {
+    Matrix(std::initializer_list<std::initializer_list<T>>&& initMat) {
         // 1. assertion
         assert(initMatSize_check(initMat));
         assert(initMat_check(initMat));
@@ -273,8 +287,7 @@ public:
             ++currRowNum;
         }
     }
-    explicit Matrix(std::vector<
-                    std::vector<T>>& initMat) {
+    explicit Matrix(std::vector<std::vector<T>>& initMat) {
         // 1. assertion
         assert(initMatSize_check(initMat));
         assert(initMat_check(initMat));
@@ -346,6 +359,10 @@ public:
         return Matrix::A_eq_B(A, subbed);
     }
     friend constexpr Matrix operator*=(Matrix& A, Matrix& B) {
+        auto multiplied = Matrix::A_multiply_B(A, B);
+        return Matrix::A_eq_B(A, multiplied);
+    }
+    friend constexpr Matrix operator*=(Matrix& A, arithmetic auto B) {
         auto multiplied = Matrix::A_multiply_B(A, B);
         return Matrix::A_eq_B(A, multiplied);
     }

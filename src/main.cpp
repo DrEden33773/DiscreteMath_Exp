@@ -21,4 +21,7 @@ int main(int argc, char** argv) {
 
     added ^= 2;
     added.echo();
+
+    added *= 2;
+    added.echo();
 }
