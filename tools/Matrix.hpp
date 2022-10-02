@@ -37,8 +37,22 @@ private:
             }
         }
     }
-    bool initMat_check(std::initializer_list<
-                       std::initializer_list<T>>& initMat) {
+    /// @brief check initMat's size
+    /// @param initMat
+    /// @return initMat.size() != 0 (bool)
+    constexpr bool initMatSize_check(std::initializer_list<
+                                     std::initializer_list<T>>& initMat) {
+        return initMat.size() != 0;
+    }
+    constexpr bool initMatSize_check(std::vector<
+                                     std::vector<T>>& initMat) {
+        return initMat.size() != 0;
+    }
+    /// @brief check if each row in the initMat has the same size
+    /// @param initMat
+    /// @return bool
+    constexpr bool initMat_check(std::initializer_list<
+                                 std::initializer_list<T>>& initMat) {
         bool   ifOK       = true;
         size_t tmp_Column = initMat.begin()->size();
         for (auto& initColumn : initMat) {
@@ -49,8 +63,8 @@ private:
         }
         return ifOK;
     }
-    bool initMat_check(std::vector<
-                       std::vector<T>>& initMat) {
+    constexpr bool initMat_check(std::vector<
+                                 std::vector<T>>& initMat) {
         bool   ifOK       = true;
         size_t tmp_Column = initMat.begin()->size();
         for (auto& initColumn : initMat) {
@@ -64,11 +78,11 @@ private:
     Matrix() = default; // only used while creating a zero mat
 
 public:
-    static bool ifEmpty(Matrix& input) {
+    static constexpr bool ifEmpty(Matrix& input) {
         return input.SizeOf_Column == 0 || input.SizeOf_Row == 0;
     }
-    static bool ifZero(Matrix& input) {
-        assert(!ifEmpty(input));
+    static constexpr bool ifZero(Matrix& input) {
+        static_assert(!ifEmpty(input));
         bool res = true;
         for (auto& currRow : input) {
             for (auto& currElem : currRow) {
@@ -80,18 +94,18 @@ public:
         }
         return res;
     }
-    static bool if_same_type(Matrix& A, Matrix& B) {
+    static constexpr bool if_same_type(Matrix& A, Matrix& B) {
         using TypeA = decltype(A.TypeIdentifier);
         using TypeB = decltype(B.TypeIdentifier);
         return std::is_same<TypeA, TypeB>::value;
     }
-    static bool addable(Matrix& A, Matrix& B) {
+    static constexpr bool addable(Matrix& A, Matrix& B) {
         bool if_same_row    = A.SizeOf_Row == B.SizeOf_Row;
         bool if_same_column = A.SizeOf_Column == B.SizeOf_Column;
         bool if_same_type   = Matrix::if_same_type(A, B);
         return if_same_column && if_same_row && if_same_type;
     }
-    static bool multipliable(Matrix& A, Matrix& B) {
+    static constexpr bool multipliable(Matrix& A, Matrix& B) {
         bool if_col_eq_row = A.SizeOf_Column == B.SizeOf_Row;
         bool if_same_type  = Matrix::if_same_type(A, B);
         return if_col_eq_row && if_same_type;
@@ -152,7 +166,7 @@ public:
     Matrix(std::initializer_list<
            std::initializer_list<T>>&& initMat) {
         // 1. assertion
-        assert(initMat.size() != 0);
+        assert(initMatSize_check(initMat));
         assert(initMat_check(initMat));
         // 2. init zero matrix
         SizeOf_Row    = initMat.size();
@@ -172,7 +186,7 @@ public:
     explicit Matrix(std::vector<
                     std::vector<T>>& initMat) {
         // 1. assertion
-        assert(initMat.size() != 0);
+        assert(initMatSize_check(initMat));
         assert(initMat_check(initMat));
         // 2. init zero matrix
         SizeOf_Row    = initMat.size();
