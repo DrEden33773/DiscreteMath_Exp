@@ -423,7 +423,7 @@ public:
         auto anotherMat = test * 2.1;
         anotherMat.echo();
 
-        // the behavior below will be strictly prohibited
+        // the behavior below will be prohibited
         // auto wrongMat = Matrix<char>::CreateZeroMat();
 
         auto transposition = anotherMat.transposition();
