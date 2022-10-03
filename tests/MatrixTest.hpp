@@ -9,6 +9,8 @@
  *
  */
 
+#pragma once
+
 #include "../tools/Matrix.hpp"
 
 namespace Test {
