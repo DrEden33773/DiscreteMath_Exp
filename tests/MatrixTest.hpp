@@ -1,5 +1,5 @@
 /**
- * @file Matrix.cpp
+ * @file MatrixTest.hpp
  * @author Eden (edwardwang33773@gmail.com)
  * @brief Test of the function of `Matrix` module
  * @version 0.1
@@ -11,10 +11,10 @@
 
 #include "../tools/Matrix.hpp"
 
-using Tool::Matrix;
+namespace Test {
 
-int main(int argc, char** argv) {
-    Matrix<int> test = {
+void MatrixTest() {
+    Tool::Matrix<int> test = {
         { 1, 2, 3 },
         { 4, 5, 6 },
         { 7, 8, 9 },
@@ -45,3 +45,5 @@ int main(int argc, char** argv) {
     auto transposition = anotherMat.transposition();
     transposition.echo();
 }
+
+} // namespace Test

@@ -1,7 +1,5 @@
-#include "../tools/Matrix.hpp"
-
-using Tool::Matrix;
+#include "../tests/MatrixTest.hpp"
 
 int main(int argc, char** argv) {
-    Matrix<>::example();
+    Test::MatrixTest();
 }
