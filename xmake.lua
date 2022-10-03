@@ -6,9 +6,7 @@ target("DiscreteMath_Exp")
     set_languages("clatest", "gnuxxlatest")
     add_includedirs(
         "/usr/include", 
-        "/usr/local/include",
-        "./tools",
-        "./lib"
+        "/usr/local/include"
     )
 
 --
