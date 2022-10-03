@@ -10,12 +10,18 @@
  */
 
 #pragma once
-#include <bits/stdc++.h>
+
+#include <cassert>
+#include <initializer_list>
+#include <iostream>
+#include <type_traits>
+#include <vector>
 
 namespace Tool {
 
 template <typename T>
-concept arithmetic = std::is_arithmetic<T>::value;
+concept arithmetic
+    = std::is_arithmetic<T>::value;
 
 template <typename T>
 concept notChar = !(
