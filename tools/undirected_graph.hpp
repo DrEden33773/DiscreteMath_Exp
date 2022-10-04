@@ -19,13 +19,24 @@ using intMat = Tool::Matrix<int>;
 
 class undirected_graph {
 private:
-    std::unique_ptr<intMat> DataMat; // a safe pointer
     struct info {
         size_t num_of_nodes = 0;
         size_t num_of_edges = 0;
-        bool   is_weighted  = false;
+
+        info()                         = default;
+        info(const info& i)            = default;
+        info(info&& i)                 = default;
+        info& operator=(const info& i) = default;
+        info& operator=(info&& i)      = default;
+        ~info()                        = default;
+
+        explicit info(info* i) {
+            num_of_nodes = i->num_of_nodes;
+            num_of_edges = i->num_of_edges;
+        }
     };
-    info GraphInfo;
+    std::unique_ptr<intMat> DataMat   = nullptr; // safe pointer
+    std::unique_ptr<info>   GraphInfo = nullptr; // safe pointer
 
 public:
     ~undirected_graph() = default;
@@ -35,28 +46,34 @@ public:
     undirected_graph(undirected_graph&& another) noexcept {
         DataMat.reset(another.DataMat.release());
         another.DataMat.reset(nullptr);
-        GraphInfo = another.GraphInfo;
+        GraphInfo.reset(another.GraphInfo.release());
+        another.GraphInfo.reset(nullptr);
     }
     /// @brief copy constructor
     undirected_graph(const undirected_graph& another) {
         DataMat.reset(
             new intMat(another.DataMat.get())
         );
-        GraphInfo = another.GraphInfo;
+        GraphInfo.reset(
+            new info(another.GraphInfo.get())
+        );
+    }
+    /// @brief move assignment
+    undirected_graph& operator=(undirected_graph&& another) noexcept {
+        DataMat.reset(another.DataMat.release());
+        another.DataMat.reset(nullptr);
+        GraphInfo.reset(another.GraphInfo.release());
+        another.GraphInfo.reset(nullptr);
+        return *this;
     }
     /// @brief copy assignment
     undirected_graph& operator=(const undirected_graph& another) {
         DataMat.reset(
             new intMat(another.DataMat.get())
         );
-        GraphInfo = another.GraphInfo;
-        return *this;
-    }
-    /// @brief move assignment
-    undirected_graph& operator=(undirected_graph&& another) noexcept {
-        DataMat.reset(another.DataMat.release());
-        another.DataMat.reset(nullptr);
-        GraphInfo = another.GraphInfo;
+        GraphInfo.reset(
+            new info(another.GraphInfo.get())
+        );
         return *this;
     }
 
@@ -91,7 +108,7 @@ public:
         undirected_graph res = { { 0 } };
         return std::move(res);
     }
-    static undirected_graph&& create_zero(size_t num_of_nodes) {
+    static undirected_graph&& create_zero(size_t num_of_nodes = 1) {
         std::vector<int> initRaw;
         initRaw.reserve(num_of_nodes);
         for (size_t i = 0; i < num_of_nodes; ++i) {
