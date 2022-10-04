@@ -12,6 +12,7 @@
 #pragma once
 
 #include "../tools/Matrix.hpp"
+#include <cassert>
 
 namespace Test {
 

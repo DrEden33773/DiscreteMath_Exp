@@ -3,4 +3,5 @@
 
 int main(int argc, char** argv) {
     Test::MatrixTest();
+    Test::UndirectedGraphTest();
 }

@@ -35,18 +35,16 @@ private:
             num_of_edges = i->num_of_edges;
         }
     };
-    std::unique_ptr<intMat> DataMat   = nullptr; // safe pointer
-    std::unique_ptr<info>   GraphInfo = nullptr; // safe pointer
+    std::shared_ptr<Tool::Matrix<int>> DataMat   = nullptr; // safe pointer
+    std::shared_ptr<info>              GraphInfo = nullptr; // safe pointer
 
 public:
     ~undirected_graph() = default;
     undirected_graph()  = delete; // something has to delete to avoid error
     /// @brief move constructor
     undirected_graph(undirected_graph&& another) noexcept {
-        DataMat.reset(another.DataMat.release());
-        another.DataMat.reset(nullptr);
-        GraphInfo.reset(another.GraphInfo.release());
-        another.GraphInfo.reset(nullptr);
+        DataMat.reset(another.DataMat.get());
+        GraphInfo.reset(another.GraphInfo.get());
     }
     /// @brief copy constructor
     undirected_graph(const undirected_graph& another) {
@@ -59,10 +57,8 @@ public:
     }
     /// @brief move assignment
     undirected_graph& operator=(undirected_graph&& another) noexcept {
-        DataMat.reset(another.DataMat.release());
-        another.DataMat.reset(nullptr);
-        GraphInfo.reset(another.GraphInfo.release());
-        another.GraphInfo.reset(nullptr);
+        DataMat.reset(another.DataMat.get());
+        GraphInfo.reset(another.GraphInfo.get());
         return *this;
     }
     /// @brief copy assignment
@@ -91,22 +87,22 @@ public:
             initVec_inner.clear();
         }
 
-        DataMat = std::make_unique<Tool::Matrix<int>>(initVec);
+        DataMat = std::make_shared<Tool::Matrix<int>>(initVec);
     }
     explicit undirected_graph(std::vector<
                               std::vector<int>>& initMat) {
-        DataMat = std::make_unique<Tool::Matrix<int>>(initMat);
+        DataMat = std::make_shared<Tool::Matrix<int>>(initMat);
     }
     explicit undirected_graph(std::vector<
                               std::vector<int>>&& initMat) {
-        DataMat = std::make_unique<Tool::Matrix<int>>(initMat);
+        DataMat = std::make_shared<Tool::Matrix<int>>(initMat);
     }
 
-    static undirected_graph&& create_trivial() {
+    static undirected_graph create_trivial() {
         undirected_graph res = { { 0 } };
-        return std::move(res);
+        return res;
     }
-    static undirected_graph&& create_zero(size_t num_of_nodes = 1) {
+    static undirected_graph create_zero(size_t num_of_nodes = 1) {
         std::vector<int> initRaw;
         initRaw.reserve(num_of_nodes);
         for (size_t i = 0; i < num_of_nodes; ++i) {
@@ -118,12 +114,14 @@ public:
             initMat.emplace_back(initRaw);
         }
         undirected_graph res(std::move(initMat));
-        return std::move(res);
+        return res;
     }
     static constexpr bool is_same(
         const undirected_graph& lhs,
         const undirected_graph& rhs
     ) {
-        return *(lhs.DataMat) == *(rhs.DataMat);
+        auto l_mat = lhs.DataMat.get();
+        auto r_mat = rhs.DataMat.get();
+        return Tool::Matrix<int>::A_eq_B(l_mat, r_mat);
     }
 };

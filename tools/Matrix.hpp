@@ -148,7 +148,7 @@ public:
             && !if_unsigned_long
             && !if_unsigned_long_long;
     }
-    static constexpr bool eqable(Matrix& A, Matrix& B) {
+    static constexpr bool assignable(Matrix& A, Matrix& B) {
         bool if_same_row = A.SizeOf_Row == B.SizeOf_Row;
         bool if_same_col = A.SizeOf_Column == B.SizeOf_Column;
         return if_same_row && if_same_col;
@@ -262,9 +262,9 @@ public:
         }
         return std::move(res);
     }
-    static constexpr auto A_eq_B(Matrix& A, Matrix& B) {
-        if (!Matrix::eqable(A, B)) {
-            throw std::logic_error("Matrix {A} and {B} is not eqable!");
+    static constexpr auto A_assigned_by_B(Matrix& A, Matrix& B) {
+        if (!Matrix::assignable(A, B)) {
+            throw std::logic_error("Matrix {A} and {B} is not assignable!");
         }
         using resMatType = decltype(A.TypeIdentifier);
         auto res         = Matrix<resMatType>::CreateZeroMat(
@@ -278,6 +278,35 @@ public:
             }
         }
         return std::move(res);
+    }
+    static constexpr bool A_eq_B(Matrix& A, Matrix& B) {
+        if (!Matrix::assignable(A, B)) {
+            // throw std::logic_error("Matrix {A} and {B} is incomparable!");
+            return false; // we could still assert that two incomparable matrix is not equal
+        }
+        for (int row = 1; row <= A.SizeOf_Row; ++row) {
+            for (int col = 1; col <= A.SizeOf_Column; ++col) {
+                if (A(row, col) != B(row, col)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    static constexpr bool A_eq_B(Matrix* A, Matrix* B) {
+#define MatA (*A)
+#define MatB (*B)
+        if (!Matrix::assignable(MatA, MatB)) {
+            return false;
+        }
+        for (int row = 1; row <= MatA.SizeOf_Row; ++row) {
+            for (int col = 1; col <= MatA.SizeOf_Column; ++col) {
+                if (MatA(row, col) != MatB(row, col)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     constexpr auto transposition() {
         Matrix& toOpt = *this;
@@ -444,28 +473,34 @@ public:
     friend constexpr auto operator^(Matrix& A, size_t N) {
         return Matrix::A_q_pow_N(A, N);
     }
+    friend constexpr bool operator==(Matrix& A, Matrix& B) {
+        return Matrix::A_eq_B(A, B);
+    }
+    // friend constexpr bool operator==(Matrix* A, Matrix* B) { // error
+    //     return Matrix::A_eq_B(A, B);
+    // }
     constexpr auto operator=(Matrix& B) {
-        return Matrix::A_eq_B(*this, B);
+        return Matrix::A_assigned_by_B(*this, B);
     }
     friend constexpr auto operator+=(Matrix& A, Matrix& B) {
         auto added = Matrix::A_add_B(A, B);
-        return Matrix::A_eq_B(A, added);
+        return Matrix::A_assigned_by_B(A, added);
     }
     friend constexpr auto operator-=(Matrix& A, Matrix& B) {
         auto subbed = Matrix::A_sub_B(A, B);
-        return Matrix::A_eq_B(A, subbed);
+        return Matrix::A_assigned_by_B(A, subbed);
     }
     friend constexpr auto operator*=(Matrix& A, Matrix& B) {
         auto multiplied = Matrix::A_multiply_B(A, B);
-        return Matrix::A_eq_B(A, multiplied);
+        return Matrix::A_assigned_by_B(A, multiplied);
     }
     friend constexpr auto operator*=(Matrix& A, arithmetic auto B) {
         auto multiplied = Matrix::A_multiply_B(A, B);
-        return Matrix::A_eq_B(A, multiplied);
+        return Matrix::A_assigned_by_B(A, multiplied);
     }
     friend constexpr auto operator^=(Matrix& A, size_t N) {
         auto powered = Matrix::A_q_pow_N(A, N);
-        return Matrix::A_eq_B(A, powered);
+        return Matrix::A_assigned_by_B(A, powered);
     }
 };
 
