@@ -120,4 +120,10 @@ public:
         undirected_graph res(std::move(initMat));
         return std::move(res);
     }
+    static constexpr bool is_same(
+        const undirected_graph& lhs,
+        const undirected_graph& rhs
+    ) {
+        return *(lhs.DataMat) == *(rhs.DataMat);
+    }
 };
