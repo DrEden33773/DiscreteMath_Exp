@@ -41,7 +41,6 @@ private:
 public:
     ~undirected_graph() = default;
     undirected_graph()  = delete; // something has to delete to avoid error
-
     /// @brief move constructor
     undirected_graph(undirected_graph&& another) noexcept {
         DataMat.reset(another.DataMat.release());
@@ -76,7 +75,6 @@ public:
         );
         return *this;
     }
-
     undirected_graph(std::initializer_list<
                      std::initializer_list<int>>&& initMat) {
         std::vector<std::vector<int>> initVec;
