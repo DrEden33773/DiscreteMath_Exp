@@ -182,7 +182,7 @@ public:
                 res(row, col) = A(row, col) + B(row, col);
             }
         }
-        return res;
+        return std::move(res);
     }
     static constexpr auto A_sub_B(Matrix& A, Matrix& B) {
         if (!Matrix::subable(A, B)) {
@@ -198,7 +198,7 @@ public:
                 res(row, col) = A(row, col) - B(row, col);
             }
         }
-        return res;
+        return std::move(res);
     }
     static constexpr auto A_multiply_B(Matrix& A, Matrix& B) {
         if (!Matrix::multipliable(A, B)) {
@@ -227,7 +227,7 @@ public:
             }
         } // https://zhuanlan.zhihu.com/p/146250334
 
-        return res;
+        return std::move(res);
     }
     static constexpr auto A_multiply_B(Matrix& A, arithmetic auto B) {
         assert(!ifEmpty(A));
@@ -242,7 +242,7 @@ public:
                 res(row, col) = static_cast<NewType>(A(row, col)) * B;
             }
         }
-        return res;
+        return std::move(res);
     }
     static constexpr auto A_q_pow_N(Matrix A, size_t N) { // A should not be changed
         if (!Matrix::multipliable(A, A)) {
@@ -260,7 +260,7 @@ public:
             A *= A;
             N >>= 1;
         }
-        return res;
+        return std::move(res);
     }
     static constexpr auto A_eq_B(Matrix& A, Matrix& B) {
         if (!Matrix::eqable(A, B)) {
@@ -277,7 +277,7 @@ public:
                 res(row, col) = B(row, col);
             }
         }
-        return res;
+        return std::move(res);
     }
     constexpr auto transposition() {
         Matrix& toOpt = *this;
@@ -335,6 +335,71 @@ public:
             ++currRowNum;
         }
     }
+    explicit Matrix(std::vector<std::vector<T>>&& initMat) {
+        // 1. assertion
+        assert(initMatSize_check(initMat));
+        assert(initMat_check(initMat));
+        // 2. init zero matrix
+        SizeOf_Row    = initMat.size();
+        SizeOf_Column = initMat.begin()->size();
+        buildZeroMat(SizeOf_Row, SizeOf_Column);
+        // 3. write to matrix
+        unsigned short currRowNum = 0;
+        for (auto& initRow : initMat) {
+            unsigned short currColNum = 0;
+            for (auto& initNum : initRow) {
+                Data[currRowNum][currColNum] = initNum;
+                ++currColNum;
+            }
+            ++currRowNum;
+        }
+    }
+    explicit Matrix(Matrix<T>* initPtr) {
+        // 1. assertion
+        assert(initPtr != nullptr);          // could dismiss
+        assert(initPtr->SizeOf_Row != 0);    // could dismiss
+        assert(initPtr->SizeOf_Column != 0); // could dismiss
+        // 2. init zero matrix
+        SizeOf_Row    = initPtr->SizeOf_Row;
+        SizeOf_Column = initPtr->SizeOf_Column;
+        buildZeroMat(SizeOf_Row, SizeOf_Column);
+        // 3. write to matrix
+        for (int row = 1; row <= SizeOf_Row; ++row) {
+            for (int col = 1; col <= SizeOf_Column; ++col) {
+                Data[row - 1][col - 1] = (*initPtr)(row, col);
+            }
+        }
+    }
+    Matrix(Matrix<T>&& initMat) noexcept {
+        // 1. assertion
+        assert(initMat.SizeOf_Row != 0);    // could dismiss
+        assert(initMat.SizeOf_Column != 0); // could dismiss
+        // 2. init zero matrix
+        SizeOf_Row    = initMat.SizeOf_Row;
+        SizeOf_Column = initMat.SizeOf_Column;
+        buildZeroMat(SizeOf_Row, SizeOf_Column);
+        // 3. write to matrix
+        for (int row = 1; row <= SizeOf_Row; ++row) {
+            for (int col = 1; col <= SizeOf_Column; ++col) {
+                Data[row - 1][col - 1] = initMat(row, col);
+            }
+        }
+    }
+    Matrix(Matrix<T>& initMat) {
+        // 1. assertion
+        assert(initMat.SizeOf_Row != 0);    // could dismiss
+        assert(initMat.SizeOf_Column != 0); // could dismiss
+        // 2. init zero matrix
+        SizeOf_Row    = initMat.SizeOf_Row;
+        SizeOf_Column = initMat.SizeOf_Column;
+        buildZeroMat(SizeOf_Row, SizeOf_Column);
+        // 3. write to matrix
+        for (int row = 1; row <= SizeOf_Row; ++row) {
+            for (int col = 1; col <= SizeOf_Column; ++col) {
+                Data[row - 1][col - 1] = initMat(row, col);
+            }
+        }
+    };
 
     void echo() {
         for (auto& currRow : Data) {

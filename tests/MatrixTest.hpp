@@ -25,27 +25,34 @@ void MatrixTest() {
 
     auto added = test * test;
     added.echo();
+    // test.echo();
 
     added += test;
     added.echo();
+    // test.echo();
 
     added -= test;
     added.echo();
+    // test.echo();
 
     added ^= 2;
     added.echo();
+    // test.echo();
 
     added *= 2;
     added.echo();
+    // test.echo();
 
     auto anotherMat = test * 2.1;
     anotherMat.echo();
+    // test.echo();
 
     // the behavior below will be prohibited
     // auto wrongMat = Matrix<char>::CreateZeroMat();
 
     auto transposition = anotherMat.transposition();
     transposition.echo();
+    // test.echo();
 }
 
 } // namespace Test
