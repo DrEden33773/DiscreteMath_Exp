@@ -15,6 +15,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace Tool {
@@ -53,7 +54,7 @@ private:
         for (int i = 0; i < row; ++i) {
             Data.emplace_back(RowCache);
         }
-        for (auto& currRow : Data) {
+        for (auto&& currRow : Data) {
             currRow.reserve(column);
             for (int i = 0; i < column; ++i) {
                 currRow.emplace_back(0);
@@ -78,7 +79,7 @@ private:
                                  std::initializer_list<T>>& initMat) {
         bool   ifOK       = true;
         size_t tmp_Column = initMat.begin()->size();
-        for (auto& initColumn : initMat) {
+        for (auto&& initColumn : initMat) {
             if (initColumn.size() != tmp_Column) {
                 ifOK = false;
                 break;
@@ -90,7 +91,7 @@ private:
                                  std::vector<T>>& initMat) {
         bool   ifOK       = true;
         size_t tmp_Column = initMat.begin()->size();
-        for (auto& initColumn : initMat) {
+        for (auto&& initColumn : initMat) {
             if (initColumn.size() != tmp_Column) {
                 ifOK = false;
                 break;
@@ -107,8 +108,8 @@ public:
     static constexpr bool ifZero(Matrix& input) {
         static_assert(!ifEmpty(input));
         bool res = true;
-        for (auto& currRow : input) {
-            for (auto& currElem : currRow) {
+        for (auto&& currRow : input) {
+            for (auto&& currElem : currRow) {
                 if (currElem == 0) {
                     res = false;
                     break;
@@ -336,9 +337,28 @@ public:
         buildZeroMat(SizeOf_Row, SizeOf_Column);
         // 3. write to matrix
         unsigned short currRowNum = 0;
-        for (auto& initRow : initMat) {
+        for (auto&& initRow : initMat) {
             unsigned short currColNum = 0;
-            for (auto& initNum : initRow) {
+            for (auto&& initNum : initRow) {
+                Data[currRowNum][currColNum] = initNum;
+                ++currColNum;
+            }
+            ++currRowNum;
+        }
+    }
+    Matrix(std::initializer_list<std::initializer_list<T>>& initMat) {
+        // 1. assertion
+        assert(initMatSize_check(initMat));
+        assert(initMat_check(initMat));
+        // 2. init zero matrix
+        SizeOf_Row    = initMat.size();
+        SizeOf_Column = initMat.begin()->size();
+        buildZeroMat(SizeOf_Row, SizeOf_Column);
+        // 3. write to matrix
+        unsigned short currRowNum = 0;
+        for (auto&& initRow : initMat) {
+            unsigned short currColNum = 0;
+            for (auto&& initNum : initRow) {
                 Data[currRowNum][currColNum] = initNum;
                 ++currColNum;
             }
@@ -355,9 +375,9 @@ public:
         buildZeroMat(SizeOf_Row, SizeOf_Column);
         // 3. write to matrix
         unsigned short currRowNum = 0;
-        for (auto& initRow : initMat) {
+        for (auto&& initRow : initMat) {
             unsigned short currColNum = 0;
-            for (auto& initNum : initRow) {
+            for (auto&& initNum : initRow) {
                 Data[currRowNum][currColNum] = initNum;
                 ++currColNum;
             }
@@ -374,9 +394,9 @@ public:
         buildZeroMat(SizeOf_Row, SizeOf_Column);
         // 3. write to matrix
         unsigned short currRowNum = 0;
-        for (auto& initRow : initMat) {
+        for (auto&& initRow : initMat) {
             unsigned short currColNum = 0;
-            for (auto& initNum : initRow) {
+            for (auto&& initNum : initRow) {
                 Data[currRowNum][currColNum] = initNum;
                 ++currColNum;
             }
@@ -438,6 +458,23 @@ public:
             std::cout << std::endl;
         }
         std::cout << std::endl;
+    }
+    T sum() {
+        assert(!ifEmpty(*this));
+        T res = Data[0][0];
+        for (auto& currRow : Data) {
+            for (auto& currElem : currRow) {
+                res += currElem;
+            }
+        }
+        res -= Data[0][0];
+        return res;
+    }
+    size_t get_sizeof_row() {
+        return SizeOf_Row;
+    }
+    size_t get_sizeof_col() {
+        return SizeOf_Column;
     }
 
     ~Matrix() = default;
