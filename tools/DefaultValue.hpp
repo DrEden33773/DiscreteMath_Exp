@@ -13,4 +13,23 @@
 #include <type_traits>
 
 namespace Tool {
+
+template <typename T>
+concept integer
+    = std::is_same_v<T, int>
+    or std::is_same_v<T, short>
+    or std::is_same_v<T, long>
+    or std::is_same_v<T, long long>;
+
+template <typename T>
+concept unsigned_integer
+    = std::is_same_v<T, unsigned int>
+    or std::is_same_v<T, unsigned short>
+    or std::is_same_v<T, unsigned long>
+    or std::is_same_v<T, unsigned long long>;
+
+template <typename T>
+concept decimal
+    = std::is_same_v<T, float>
+    or std::is_same_v<T, double>;
 }

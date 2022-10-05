@@ -133,12 +133,6 @@ public:
     }
 
     static undirected_graph&& create_trivial() {
-        // function below will occur bug! why?
-
-        // undirected_graph res = { { 0 } };
-        // res.if_will_be_moved = true;
-        // return std::move(res);
-
         return create_zero();
     }
     static undirected_graph&& create_zero(size_t num_of_nodes = 1) {

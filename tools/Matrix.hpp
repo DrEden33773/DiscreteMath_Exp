@@ -513,9 +513,6 @@ public:
     friend constexpr bool operator==(Matrix& A, Matrix& B) {
         return Matrix::A_eq_B(A, B);
     }
-    // friend constexpr bool operator==(Matrix* A, Matrix* B) { // error
-    //     return Matrix::A_eq_B(A, B);
-    // }
     constexpr auto operator=(Matrix& B) {
         return Matrix::A_assigned_by_B(*this, B);
     }
