@@ -134,9 +134,6 @@ public:
 
     static undirected_graph&& create_trivial() {
         return create_zero();
-        // undirected_graph res = { { 0 } };
-        // res.if_will_be_moved = true;
-        // return std::move(res);
     }
     static undirected_graph&& create_zero(size_t num_of_nodes = 1) {
         std::vector<int> initRaw;
