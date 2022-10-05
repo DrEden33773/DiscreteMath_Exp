@@ -64,8 +64,8 @@ public:
     /// @brief move constructor
     undirected_graph(undirected_graph&& another) noexcept {
         DataMat           = another.DataMat;
-        another.DataMat   = nullptr;
         GraphInfo         = another.GraphInfo;
+        another.DataMat   = nullptr;
         another.GraphInfo = nullptr;
     }
     /// @brief copy constructor
@@ -76,9 +76,9 @@ public:
     /// @brief move assignment
     undirected_graph& operator=(undirected_graph&& another) noexcept {
         DataMat           = another.DataMat;
-        another.DataMat   = nullptr;
         GraphInfo         = another.GraphInfo;
         another.GraphInfo = nullptr;
+        another.DataMat   = nullptr;
         return *this;
     }
     /// @brief copy assignment
@@ -134,6 +134,9 @@ public:
 
     static undirected_graph&& create_trivial() {
         return create_zero();
+        // undirected_graph res = { { 0 } };
+        // res.if_will_be_moved = true;
+        // return std::move(res);
     }
     static undirected_graph&& create_zero(size_t num_of_nodes = 1) {
         std::vector<int> initRaw;
