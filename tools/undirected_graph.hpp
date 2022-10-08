@@ -23,9 +23,8 @@ using intMat = Tool::Matrix<int>;
 
 class undirected_graph {
 private:
-    intMat* DataMat = nullptr; // unsafe pointer
-    // info*   GraphInfo        = nullptr; // unsafe pointer
-    bool if_will_be_moved = false;
+    intMat* DataMat          = nullptr; // unsafe pointer
+    bool    if_will_be_moved = false;
 
     constexpr bool check_DataMat(intMat* DataMat) {
         return DataMat->get_sizeof_row() == DataMat->get_sizeof_col();
