@@ -231,7 +231,8 @@ public:
                     res(row, col) += tmp * B(cross, col);
                 }
             }
-        } // https://zhuanlan.zhihu.com/p/146250334
+        }
+        /// @ref https://zhuanlan.zhihu.com/p/146250334
 
         return std::move(res);
     }
@@ -522,6 +523,21 @@ public:
             }
         }
         return false;
+    }
+    static bool if_symmetric_of_main_diagonal(
+        Matrix& input
+    ) {
+        if (input.SizeOf_Column == 1 && input.SizeOf_Row == 1) {
+            return true;
+        }
+        for (int row = 1; row <= input.SizeOf_Row; ++row) {
+            for (int col = row + 1; col <= input.SizeOf_Column; ++col) {
+                if (input(row, col) != input(col, row)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     ~Matrix() = default;

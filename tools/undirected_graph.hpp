@@ -29,6 +29,9 @@ private:
     constexpr bool check_DataMat(intMat* DataMat) {
         return DataMat->get_sizeof_row() == DataMat->get_sizeof_col();
     }
+    bool if_symmetric_of_main_diagonal() {
+        return Tool::Matrix<int>::if_symmetric_of_main_diagonal(*DataMat);
+    }
 
     size_t return_num_of_edges() {
         return DataMat->sum() / 2;
@@ -86,6 +89,10 @@ public:
             delete DataMat;
             throw std::logic_error("Input Matrix doesn't have the same num of row and col!");
         };
+        if (!if_symmetric_of_main_diagonal()) {
+            delete DataMat;
+            throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
+        };
     }
     explicit undirected_graph(std::vector<
                               std::vector<int>>& initMat) {
@@ -93,6 +100,10 @@ public:
         if (!check_DataMat(DataMat)) {
             delete DataMat;
             throw std::logic_error("Input Matrix doesn't have the same num of row and col!");
+        };
+        if (!if_symmetric_of_main_diagonal()) {
+            delete DataMat;
+            throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
         };
     }
     explicit undirected_graph(std::vector<
@@ -104,6 +115,10 @@ public:
         if (!check_DataMat(DataMat)) {
             delete DataMat;
             throw std::logic_error("Input Matrix doesn't have the same num of row and col!");
+        };
+        if (!if_symmetric_of_main_diagonal()) {
+            delete DataMat;
+            throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
         };
     }
 
