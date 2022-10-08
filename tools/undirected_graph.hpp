@@ -219,6 +219,19 @@ public:
         return true;
     }
 
+    /// @brief judge if the input graph is a trivial graph
+    static bool if_trivial(undirected_graph& input) {
+        Tool::Matrix<int>& inputDataMat = *(input.DataMat);
+        if (inputDataMat.get_sizeof_col() != 1
+            || inputDataMat.get_sizeof_row() != 1) {
+            return false;
+        }
+        if (inputDataMat(1, 1) != 0) {
+            return false;
+        }
+        return true;
+    }
+
     /// @brief try to return all euler circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(undirected_graph& input) {
@@ -265,14 +278,21 @@ public:
         return res;
     }
 
-    /// @brief just return an euler circle, start vertex depends on the input
+    /// @brief Fleury_Algorithm ( @b discarded )
     /// @warning @b This_Fleury-liked_function_is_discarded
     static std::string
-    return_an_euler_circle(undirected_graph& input, size_t vertex) {
+    return_an_euler_circle_F(undirected_graph& input, size_t vertex) {
         std::string res = {};
+
+        res += "Fleury_Algorithm has been discarded! Won't find euler path!";
+        return res;
 
         if (!input.if_has_euler_circle(input)) {
             res += "NO euler circle! ";
+            return res;
+        }
+        if (input.if_trivial(input)) {
+            res += "Trivial -> " + std::to_string(vertex) + " -> fin. ";
             return res;
         }
 
@@ -327,6 +347,7 @@ public:
 
     /// @brief Hierholzer Algorithm, T(n)=O(n), fastest
     /// @ref https://www.jianshu.com/p/8394b8e5b878
+    /// @attention this is a reference, not the original work of me!
     static std::string
     return_an_euler_circle_H_fastest(undirected_graph& input, size_t vertex) {
         std::string        res;
@@ -335,6 +356,10 @@ public:
 
         if (!input.if_has_euler_circle(input)) {
             res += "NO euler circle! ";
+            return res;
+        }
+        if (input.if_trivial(input)) {
+            res += "Trivial -> " + std::to_string(vertex) + " -> fin. ";
             return res;
         }
 
@@ -390,6 +415,10 @@ public:
 
         if (!input.if_has_euler_circle(input)) {
             res += "NO euler circle! ";
+            return res;
+        }
+        if (input.if_trivial(input)) {
+            res += "Trivial -> " + std::to_string(vertex) + " -> fin. ";
             return res;
         }
 
