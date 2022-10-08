@@ -154,9 +154,8 @@ public:
         bool res              = true;
         bool if_is_connective = if_connective(input);
 
-        size_t curr_vertex
-            = 1;
-        auto num_of_node = input.return_num_of_nodes();
+        size_t curr_vertex = 1;
+        auto   num_of_node = input.return_num_of_nodes();
 
         while (curr_vertex <= num_of_node) {
             size_t curr_deg = input.DataMat->sum_of_row(curr_vertex);
