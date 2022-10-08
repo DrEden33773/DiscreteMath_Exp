@@ -14,6 +14,7 @@
 #include <cassert>
 #include <initializer_list>
 #include <iostream>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -39,9 +40,13 @@ concept notChar = !(
 template <typename T = int> // default type is int
 requires arithmetic<T> && notChar<T>
 class Matrix {
+    friend class undirected_graph;
+    friend class info;
+
 private:
-    std::vector<std::vector<T>> Data;
-    std::vector<T>              RowCache;
+    std::vector<std::vector<T>>
+                   Data;
+    std::vector<T> RowCache;
 
     T      TypeIdentifier;
     size_t SizeOf_Row    = 0;
@@ -155,12 +160,12 @@ public:
         return if_same_row && if_same_col;
     }
 
-    static auto CreateZeroMat(size_t& row, size_t& column) {
+    static Matrix<T> CreateZeroMat(size_t row, size_t column) {
         Matrix<T> ZeroMat;
         ZeroMat.buildZeroMat(row, column);
         return ZeroMat;
     }
-    static auto CreateIdentityMat(size_t& row, size_t& column) {
+    static Matrix<T> CreateIdentityMat(size_t row, size_t column) {
         Matrix<T> IdentityMat;
         IdentityMat.buildZeroMat(row, column);
         for (int row = 1; row <= IdentityMat.SizeOf_Row; ++row) {
@@ -470,11 +475,53 @@ public:
         res -= Data[0][0];
         return res;
     }
-    size_t get_sizeof_row() {
+    T sum_of_row(size_t input_row) {
+        if (input_row > SizeOf_Row) {
+            throw std::out_of_range("input row > SizeOf row");
+        }
+        T res = Data[0][0];
+
+        size_t input_row_index = input_row - 1;
+        for (size_t curr_col_index = 0;
+             curr_col_index < SizeOf_Column;
+             ++curr_col_index) {
+            res += Data[input_row_index][curr_col_index];
+        }
+        res -= Data[0][0];
+        return res;
+    }
+    T sum_of_col(size_t input_col) {
+        if (input_col > SizeOf_Column) {
+            throw std::out_of_range("input col > SizeOf col");
+        }
+        T res = Data[0][0];
+
+        size_t input_col_index = input_col - 1;
+        for (size_t curr_row_index = 0;
+             curr_row_index < SizeOf_Row;
+             ++curr_row_index) {
+            res += Data[curr_row_index][input_col_index];
+        }
+        res -= Data[0][0];
+        return res;
+    }
+    constexpr size_t get_sizeof_row() {
         return SizeOf_Row;
     }
-    size_t get_sizeof_col() {
+    constexpr size_t get_sizeof_col() {
         return SizeOf_Column;
+    }
+    static bool if_have_zero_integer(
+        Matrix<int>& input
+    ) {
+        for (int row = 1; row <= input.SizeOf_Row; ++row) {
+            for (int col = 1; col <= input.SizeOf_Column; ++col) {
+                if (input(row, col) == 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     ~Matrix() = default;

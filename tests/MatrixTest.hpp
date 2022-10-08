@@ -24,7 +24,7 @@ void MatrixTest() {
     };
     test.echo();
 
-    auto added = test * test;
+    auto added = test ^ 2;
     added.echo();
     // test.echo();
 

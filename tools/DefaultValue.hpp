@@ -32,4 +32,11 @@ template <typename T>
 concept decimal
     = std::is_same_v<T, float>
     or std::is_same_v<T, double>;
-}
+
+template <typename T>
+concept mathematical
+    = integer<T>
+    or unsigned_integer<T>
+    or decimal<T>;
+
+} // namespace Tool
