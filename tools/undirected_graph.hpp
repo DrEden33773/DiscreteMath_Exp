@@ -21,34 +21,6 @@
 
 using intMat = Tool::Matrix<int>;
 
-struct info {
-    size_t num_of_nodes = 1;
-    size_t num_of_edges = 0;
-
-    info()                         = default;
-    info(const info& i)            = default;
-    info(info&& i)                 = default;
-    info& operator=(const info& i) = default;
-    info& operator=(info&& i)      = default;
-    ~info()                        = default;
-
-    explicit info(info* i) {
-        num_of_nodes = i->num_of_nodes;
-        num_of_edges = i->num_of_edges;
-    }
-
-    explicit info(intMat* initMat) {
-        assert(initMat->get_sizeof_row() == initMat->get_sizeof_col());
-        num_of_nodes = initMat->get_sizeof_row();
-        num_of_edges = initMat->sum() / 2;
-    }
-    void update_info(intMat* initMat) {
-        assert(initMat->get_sizeof_row() == initMat->get_sizeof_col());
-        num_of_nodes = initMat->get_sizeof_row();
-        num_of_edges = initMat->sum() / 2;
-    }
-};
-
 class undirected_graph {
 private:
     intMat* DataMat = nullptr; // unsafe pointer
@@ -79,7 +51,6 @@ public:
     /// @brief move constructor
     undirected_graph(undirected_graph&& another) noexcept {
         DataMat = another.DataMat;
-        // another.DataMat = nullptr;
     }
     /// @brief copy constructor
     undirected_graph(const undirected_graph& another) {
@@ -88,7 +59,6 @@ public:
     /// @brief move assignment
     undirected_graph& operator=(undirected_graph&& another) noexcept {
         DataMat = another.DataMat;
-        // another.DataMat = nullptr;
         return *this;
     }
     /// @brief copy assignment
@@ -490,5 +460,14 @@ public:
         res += "fin. ";
 
         return res;
+    }
+
+    /// @brief operator overloads
+    friend bool operator==(undirected_graph& lhs, undirected_graph& rhs) {
+        bool if_data_mat_same = *(lhs.DataMat) == *(rhs.DataMat);
+        return if_data_mat_same;
+    }
+    friend bool operator!=(undirected_graph& lhs, undirected_graph& rhs) {
+        return !(lhs == rhs);
     }
 };
