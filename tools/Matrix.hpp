@@ -174,7 +174,8 @@ public:
         return IdentityMat;
     }
 
-    static constexpr auto A_add_B(Matrix& A, Matrix& B) {
+    static constexpr auto A_add_B(Matrix& A, Matrix& B)
+        -> Matrix<decltype(A.TypeIdentifier)> {
         if (!Matrix::addable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
         }
@@ -188,9 +189,11 @@ public:
                 res(row, col) = A(row, col) + B(row, col);
             }
         }
-        return std::move(res);
+        return res;
     }
-    static constexpr auto A_sub_B(Matrix& A, Matrix& B) {
+    static constexpr auto A_sub_B(Matrix& A, Matrix& B)
+        -> Matrix<decltype(A.TypeIdentifier)> {
+
         if (!Matrix::subable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not addable!");
         }
@@ -204,9 +207,11 @@ public:
                 res(row, col) = A(row, col) - B(row, col);
             }
         }
-        return std::move(res);
+        return res;
     }
-    static constexpr auto A_multiply_B(Matrix& A, Matrix& B) {
+    static constexpr auto A_multiply_B(Matrix& A, Matrix& B)
+        -> Matrix<decltype(A.TypeIdentifier)> {
+
         if (!Matrix::multipliable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not multipliable!");
         }
@@ -234,9 +239,10 @@ public:
         }
         /// @ref https://zhuanlan.zhihu.com/p/146250334
 
-        return std::move(res);
+        return res;
     }
-    static constexpr auto A_multiply_B(Matrix& A, arithmetic auto B) {
+    static constexpr auto A_multiply_B(Matrix& A, arithmetic auto B)
+        -> Matrix<decltype(B)> {
         assert(!ifEmpty(A));
 
         using NewType = decltype(B);
@@ -249,9 +255,10 @@ public:
                 res(row, col) = static_cast<NewType>(A(row, col)) * B;
             }
         }
-        return std::move(res);
+        return res;
     }
-    static constexpr auto A_q_pow_N(Matrix A, size_t N) { // A should not be changed
+    static constexpr auto A_q_pow_N(Matrix A, size_t N)
+        -> Matrix<decltype(A.TypeIdentifier)> { // A should not be changed
         if (!Matrix::multipliable(A, A)) {
             throw std::logic_error("Matrix {A} and {A} is not multipliable!");
         }
@@ -267,9 +274,10 @@ public:
             A *= A;
             N >>= 1;
         }
-        return std::move(res);
+        return res;
     }
-    static constexpr auto A_assigned_by_B(Matrix& A, Matrix& B) {
+    static constexpr auto A_assigned_by_B(Matrix& A, Matrix& B)
+        -> Matrix<decltype(A.TypeIdentifier)> {
         if (!Matrix::assignable(A, B)) {
             throw std::logic_error("Matrix {A} and {B} is not assignable!");
         }
@@ -284,7 +292,7 @@ public:
                 res(row, col) = B(row, col);
             }
         }
-        return std::move(res);
+        return res;
     }
     static constexpr bool A_eq_B(Matrix& A, Matrix& B) {
         if (!Matrix::assignable(A, B)) {
@@ -315,7 +323,8 @@ public:
         }
         return true;
     }
-    constexpr auto transposition() {
+    constexpr auto transposition()
+        -> Matrix<decltype(this->TypeIdentifier)> {
         Matrix& toOpt = *this;
         assert(!ifEmpty(toOpt));
 
@@ -558,7 +567,7 @@ public:
         }
         return Data[row - 1][col - 1]; // remember to sub 1
     }
-    friend constexpr auto operator+(Matrix& A, Matrix& B) {
+    friend constexpr auto operator+(Matrix<T>& A, Matrix& B) {
         return Matrix::A_add_B(A, B);
     }
     friend constexpr auto operator-(Matrix& A, Matrix& B) {

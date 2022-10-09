@@ -125,10 +125,10 @@ public:
         };
     }
 
-    static undirected_graph&& create_trivial() {
+    static undirected_graph create_trivial() {
         return create_zero();
     }
-    static undirected_graph&& create_zero(size_t num_of_nodes = 1) {
+    static undirected_graph create_zero(size_t num_of_nodes = 1) {
         std::vector<int> initRaw;
         initRaw.reserve(num_of_nodes);
         for (size_t i = 0; i < num_of_nodes; ++i) {
@@ -140,8 +140,7 @@ public:
             initMat.emplace_back(initRaw);
         }
         undirected_graph res(std::move(initMat));
-        res.if_will_be_moved = true;
-        return std::move(res); // call delete func here
+        return res;
     }
     static constexpr bool is_same(
         const undirected_graph& lhs,
@@ -179,7 +178,7 @@ public:
 
     /// @brief judge if is a connective graph
     static bool if_connective(undirected_graph& input) {
-        Tool::Matrix<int> inputDataMat = *(input.DataMat);
+        Tool::Matrix<int> inputDataMat(input.DataMat);
 
         auto num_of_nodes = input.return_num_of_nodes();
 

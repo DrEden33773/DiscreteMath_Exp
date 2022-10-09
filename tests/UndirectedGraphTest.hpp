@@ -16,11 +16,13 @@ namespace Test {
 
 void UndirectedGraphTest() {
     auto trivial_graph
-        = std::move(undirected_graph::create_trivial());
+        = undirected_graph::create_trivial();
+
     auto zero_graph_5
-        = std::move(undirected_graph::create_zero(5));
+        = undirected_graph::create_zero(5);
+
     auto zero_graph_1
-        = std::move(undirected_graph::create_zero());
+        = undirected_graph::create_zero();
 
     assert(undirected_graph::is_same(zero_graph_1, trivial_graph));
 }

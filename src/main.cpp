@@ -3,7 +3,7 @@
 #include "../tests/UndirectedGraphTest.hpp"
 
 int main(int argc, char** argv) {
-    // Test::MatrixTest();
-    // Test::UndirectedGraphTest();
+    Test::MatrixTest();
+    Test::UndirectedGraphTest();
     Test::EulerTest();
 }
