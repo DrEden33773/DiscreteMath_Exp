@@ -12,11 +12,14 @@
 #pragma once
 
 #include "Matrix.hpp"
+#include <algorithm>
 #include <memory>
 #include <queue>
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 using intMat = Tool::Matrix<int>;
@@ -151,6 +154,9 @@ public:
 
     /// @brief judge if has a euler circle
     static bool if_has_euler_circle(undirected_graph& input) {
+        if (input.if_trivial(input)) {
+            return true;
+        }
         bool res              = true;
         bool if_is_connective = if_connective(input);
 
@@ -183,7 +189,7 @@ public:
                 num_of_nodes
             );
 
-        for (size_t pow_num = 1;
+        for (size_t pow_num = 0; // A^0 + A^1 + A^2 + ... + A^(n-1)
              pow_num < num_of_nodes;
              ++pow_num) {
             auto powered = inputDataMat ^ pow_num;
@@ -204,7 +210,7 @@ public:
                 num_of_nodes
             );
 
-        for (size_t pow_num = 1;
+        for (size_t pow_num = 0; // A^0 + A^1 + A^2 + ... + A^(n-1)
              pow_num < num_of_nodes;
              ++pow_num) {
             auto powered = inputDataMat ^ pow_num;
@@ -216,6 +222,44 @@ public:
             return false;
         }
         return true;
+    }
+    static bool if_partial_connective( // specifically for Fleury Algorithm
+        Tool::Matrix<int>&          inputDataMat,
+        std::unordered_set<size_t>& ignore_v_set // default => empty list
+    ) {
+        if (ignore_v_set.empty()) {
+            return if_connective(inputDataMat);
+        }
+
+        bool res = true;
+
+        size_t  MatSize = inputDataMat.get_sizeof_row();
+        size_t& MatRow  = MatSize;
+        size_t& MatCol  = MatSize;
+
+        std::vector<std::vector<int>> new_init_list;
+        std::vector<int>              new_init_row;
+        new_init_list.reserve(MatSize);
+        new_init_row.reserve(MatSize);
+        for (size_t row = 1; row <= MatRow; ++row) {
+            if (ignore_v_set.contains(row)) {
+                continue;
+            }
+            for (size_t col = 1; col <= MatCol; ++col) {
+                if (ignore_v_set.contains(col)) {
+                    continue;
+                }
+                auto& curr_elem = inputDataMat(row, col);
+                new_init_row.emplace_back(curr_elem);
+            }
+            new_init_list.emplace_back(new_init_row);
+            new_init_row.clear();
+        }
+
+        Tool::Matrix<int> new_data_mat(new_init_list);
+        res = if_connective(new_data_mat);
+
+        return res;
     }
 
     /// @brief judge if the input graph is a trivial graph
@@ -231,6 +275,7 @@ public:
         return true;
     }
 
+    /// @brief Hierholzer Algorithm
     /// @brief try to return all euler circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(undirected_graph& input) {
@@ -277,14 +322,36 @@ public:
         return res;
     }
 
-    /// @brief Fleury_Algorithm ( @b discarded )
-    /// @warning @b This_Fleury-liked_function_is_discarded
+    /// @brief Fleury_Algorithm ( @b not_recommended )
+    /// @warning @b This_Fleury-liked_function_is_not_recommended
+    static std::vector<std::string>
+    return_euler_circle_set_F(undirected_graph& input) {
+        std::vector<std::string> res = {};
+
+        size_t all_vertex = input.return_num_of_nodes();
+
+        if (!input.if_has_euler_circle(input)) {
+            std::string an_euler_circle = {};
+            an_euler_circle += "NO euler circle! ";
+            res.push_back(an_euler_circle);
+            return res;
+        }
+        for (size_t curr_vertex = 1;
+             curr_vertex <= all_vertex;
+             ++curr_vertex) {
+            std::string an_euler_circle
+                = input.return_an_euler_circle_F(input, curr_vertex);
+            res.push_back(an_euler_circle);
+        }
+
+        return res;
+    }
     static std::string
     return_an_euler_circle_F(undirected_graph& input, size_t vertex) {
         std::string res = {};
 
-        res += "Fleury_Algorithm has been discarded! Won't find euler path!";
-        return res;
+        // res += "Fleury_Algorithm has been discarded! Won't find euler path!";
+        // return res;
 
         if (!input.if_has_euler_circle(input)) {
             res += "NO euler circle! ";
@@ -295,19 +362,28 @@ public:
             return res;
         }
 
-        Tool::Matrix<int>& inputDataMat = *(input.DataMat);
+        Tool::Matrix<int> inputDataMat = *(input.DataMat); // copy one
 
         // Fleury Algorithm
         size_t curr_vertex           = vertex;
         size_t original_input_vertex = vertex;
-        bool   if_start              = false;
-        while (!(if_start && curr_vertex == vertex)) {
-            if_start = true;
+        size_t num_of_col            = inputDataMat.get_sizeof_col();
+        size_t num_of_edge           = inputDataMat.sum() / 2;
 
-            auto num_of_col = input.DataMat->get_sizeof_col();
-            for (size_t col = 1;
-                 col <= num_of_col;
-                 ++col) {
+        std::stack<size_t> path; // res
+
+        std::unordered_set<size_t> ignored_vertex {};
+        ignored_vertex.reserve(num_of_col);
+
+        while (num_of_edge > 0) { // must do it ahead (at least for once)
+            path.push(curr_vertex);
+
+            size_t curr_deg = inputDataMat.sum_of_row(curr_vertex);
+            if (curr_deg == 0) {
+                break;
+            }
+
+            for (size_t col = 1; col <= num_of_col; ++col) {
                 auto& curr_elem = inputDataMat(curr_vertex, col);
                 if (curr_elem == 0) {
                     continue;
@@ -316,35 +392,55 @@ public:
                     // try to -1 each time and then judge the connectivity
                     --inputDataMat(curr_vertex, col);
                     --inputDataMat(col, curr_vertex);
-                    auto curr_vertex_degree
-                        = inputDataMat.sum_of_row(curr_vertex);
-                    if (curr_vertex_degree != 0) {
-                        if (!input.if_connective(inputDataMat)) {
+                    --curr_deg;
+                    --num_of_edge;
+                    if (curr_deg == 0) { // don't judge the connectivity
+                        // that deleted path is the only path for current vertex
+                        // then we have to adapt that path, without considering connectivity
+                        ignored_vertex.emplace(curr_vertex);
+                        curr_vertex = col;
+                        break;
+                    } else { // need to judge the connectivity
+                        if (!input.if_partial_connective(
+                                inputDataMat,
+                                ignored_vertex
+                            )) {
                             ++inputDataMat(curr_vertex, col);
                             ++inputDataMat(col, curr_vertex);
+                            ++curr_deg;
+                            ++num_of_edge;
                             continue;
-                        } else {
-                            res += std::to_string(curr_vertex);
-                            res += " -> ";
-                            curr_vertex = col;
-                            break;
                         }
-                    } else {
-                        res += std::to_string(curr_vertex);
-                        res += " -> ";
                         curr_vertex = col;
                         break;
                     }
                 }
             }
+        };
+
+        while (!path.empty()) {
+            size_t curr = path.top();
+            path.pop();
+            res += std::to_string(curr);
+            res += " -> ";
         }
 
-        res += std::to_string(original_input_vertex);
+        /**
+         * @brief
+                the last vertex is the start vertex
+                but when you try to push it into the stack in the `while` loop,
+                you'll find it's impossible because `edge == 0` and you can't get in
+                so you have to add it manually
+         * @param res
+         */
+        res = std::to_string(vertex) + " -> " + res;
+
+        res += "fin. ";
 
         return res;
     }
 
-    /// @brief Hierholzer Algorithm, T(n)=O(n), fastest
+    /// @brief Hierholzer Algorithm, T(n)=O(n^2), fastest
     /// @ref https://www.jianshu.com/p/8394b8e5b878
     /// @attention this is a reference, not the original work of me!
     static std::string
@@ -403,7 +499,8 @@ public:
         return res;
     }
 
-    /// @brief Hierholzer Algorithm, T(n)=O(n*n) [could become O(n)]
+    /// @brief Hierholzer Algorithm, T(n)=O(n^2)
+    /// @brief take @p if_has_euler_circle's @p if_connective in then T(n)=O(n^2)
     /// @brief This is slower, but easier to comprehend
     /// @e This_one_is_totally_originally_written_by_me
     /// @e Hierholzer_Algorithm_YYDS
@@ -498,6 +595,15 @@ public:
             res += std::to_string(curr);
             res += " -> ";
         }
+
+        /**
+         * @brief
+                the last vertex is the start vertex
+                but when you try to push it into the stack in the `while` loop,
+                you'll find it's impossible because `edge == 0` and you can't get in
+                so you have to add it manually
+         * @param res
+         */
         res = std::to_string(vertex) + " -> " + res;
         res += "fin. ";
 
