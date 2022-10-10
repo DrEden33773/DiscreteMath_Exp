@@ -31,6 +31,22 @@ private:
     bool if_symmetric_of_main_diagonal() {
         return Tool::Matrix<int>::if_symmetric_of_main_diagonal(*DataMat);
     }
+    bool check_self_ring() {
+        bool if_ok = true;
+
+        intMat& This_DataMat = *DataMat; // this is bind, not init
+        size_t  row          = This_DataMat.get_sizeof_row();
+        size_t  col          = This_DataMat.get_sizeof_col();
+
+        for (size_t curr_row = 1; curr_row <= row; ++curr_row) {
+            if (This_DataMat(row, row) % 2 != 0) {
+                if_ok = false;
+                break;
+            }
+        }
+
+        return if_ok;
+    }
 
     size_t return_num_of_edges() { // undirected_graph
         return DataMat->sum() / 2;
@@ -91,6 +107,12 @@ public:
             delete DataMat;
             throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
         };
+        if (!check_self_ring()) {
+            delete DataMat;
+            throw std::logic_error(
+                "Self ring in undirected_graph should be even number, but now there's an odd one!"
+            );
+        }
     }
     explicit undirected_graph(std::vector<
                               std::vector<int>>& initMat) {
@@ -103,6 +125,12 @@ public:
             delete DataMat;
             throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
         };
+        if (!check_self_ring()) {
+            delete DataMat;
+            throw std::logic_error(
+                "Self ring in undirected_graph should be even number, but now there's an odd one!"
+            );
+        }
     }
     explicit undirected_graph(std::vector<
                               std::vector<int>>&& initMat) {
@@ -118,6 +146,12 @@ public:
             delete DataMat;
             throw std::logic_error("Input Matrix is not symmetric of the main diagonal!");
         };
+        if (!check_self_ring()) {
+            delete DataMat;
+            throw std::logic_error(
+                "Self ring in undirected_graph should be even number, but now there's an odd one!"
+            );
+        }
     }
 
     static undirected_graph create_trivial() {
@@ -217,7 +251,7 @@ public:
         }
         return true;
     }
-    static bool if_partial_connective( // specifically for Fleury Algorithm
+    static bool if_partial_connective(
         Tool::Matrix<int>&          inputDataMat,
         std::unordered_set<size_t>& ignore_v_set // default => empty list
     ) {
@@ -269,7 +303,7 @@ public:
         return true;
     }
 
-    /// @brief try to return all euler circle
+    /// @brief try to return @e all @b euler_circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(undirected_graph& input) {
         std::vector<std::string> res = {};
@@ -337,7 +371,7 @@ public:
         return res;
     }
 
-    /// @brief Fleury_Algorithm ( @b not_recommended )
+    /// @brief Fleury_liked_Algorithm ( @b not_recommended )
     /// @warning @b This_Fleury-liked_function_is_not_recommended
     static std::string
     return_an_euler_circle_F(undirected_graph& input, size_t vertex) {
@@ -366,8 +400,6 @@ public:
         ignored_vertex.reserve(num_of_col);
 
         while (num_of_edge > 0) { // must do it ahead (at least for once)
-            path.push(curr_vertex);
-
             size_t curr_deg = inputDataMat.sum_of_row(curr_vertex);
             if (curr_deg == 0) {
                 break;
@@ -378,11 +410,13 @@ public:
                 if (curr_elem == 0) {
                     continue;
                 } else {
+                    path.push(curr_vertex);
                     // start to operate
                     // try to -1 each time and then judge the connectivity
-                    --inputDataMat(curr_vertex, col);
-                    --inputDataMat(col, curr_vertex);
-                    --curr_deg;
+                    int subbed_value = (curr_vertex == col) ? 2 : 1; // self-ring judgement
+                    inputDataMat(curr_vertex, col) -= subbed_value;
+                    inputDataMat(col, curr_vertex) -= subbed_value;
+                    curr_deg -= subbed_value;
                     --num_of_edge;
                     if (curr_deg == 0) { // don't judge the connectivity
                         // that deleted path is the only path for current vertex
@@ -395,9 +429,10 @@ public:
                                 inputDataMat,
                                 ignored_vertex
                             )) {
-                            ++inputDataMat(curr_vertex, col);
-                            ++inputDataMat(col, curr_vertex);
-                            ++curr_deg;
+                            path.pop();
+                            inputDataMat(curr_vertex, col) += subbed_value;
+                            inputDataMat(col, curr_vertex) += subbed_value;
+                            curr_deg += subbed_value;
                             ++num_of_edge;
                             continue;
                         }
@@ -468,8 +503,13 @@ public:
                 for (size_t col = 1; col <= num_of_col; ++col) {
                     auto curr_edge_num = inputDataMat(curr_vertex, col);
                     if (curr_edge_num > 0) {
-                        --inputDataMat(curr_vertex, col);
-                        --inputDataMat(col, curr_vertex);
+                        if (col == curr_vertex) {
+                            inputDataMat(curr_vertex, col) -= 2;
+                            inputDataMat(col, curr_vertex) -= 2;
+                        } else {
+                            --inputDataMat(curr_vertex, col);
+                            --inputDataMat(col, curr_vertex);
+                        }
                         next_vertex = col;
                         break;
                     }
@@ -555,8 +595,13 @@ public:
                     auto curr_edge_num = inputDataMat(curr_vertex, col);
                     if (curr_edge_num > 0) {
                         // remove edge
-                        --inputDataMat(curr_vertex, col);
-                        --inputDataMat(col, curr_vertex);
+                        if (col == curr_vertex) { // cut a self ring
+                            inputDataMat(curr_vertex, col) -= 2;
+                            inputDataMat(col, curr_vertex) -= 2;
+                        } else {
+                            --inputDataMat(curr_vertex, col);
+                            --inputDataMat(col, curr_vertex);
+                        }
                         // update the compensated (if not used, it's OK)
                         compensated_vertex = curr_vertex;
                         compensated_col    = col;

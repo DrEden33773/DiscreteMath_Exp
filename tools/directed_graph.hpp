@@ -204,7 +204,7 @@ public:
         }
         return true;
     }
-    static bool if_partial_connective( // specifically for Fleury Algorithm
+    static bool if_partial_connective(
         Tool::Matrix<int>&          inputDataMat,
         std::unordered_set<size_t>& ignore_v_set // default => empty list
     ) {
@@ -242,6 +242,26 @@ public:
 
         return res;
     }
+    static Tool::Matrix<int> return_undirected_matrix(
+        directed_graph& input
+    ) { // will be used in Tarjan Algorithm
+        Tool::Matrix<int> res        = *(input.DataMat);
+        size_t            num_of_row = res.get_sizeof_row();
+        size_t            num_of_col = res.get_sizeof_col();
+        // first deal with self ring
+        for (size_t row = 1; row <= num_of_row; ++row) {
+            res(row, row) *= 2;
+        }
+        // then deal with other edge
+        for (size_t row = 1; row <= num_of_row; ++row) {
+            for (size_t col = 1 + row; col <= num_of_col; ++col) {
+                int expectation_num = res(row, col) + res(col, row);
+                res(row, col)       = expectation_num;
+                res(col, row)       = expectation_num;
+            }
+        }
+        return res;
+    }
 
     /// @brief judge if the input graph is a trivial graph
     static bool if_trivial(directed_graph& input) {
@@ -256,7 +276,7 @@ public:
         return true;
     }
 
-    /// @brief try to return all euler circle
+    /// @brief try to return @e all @b euler_circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(directed_graph& input) {
         std::vector<std::string> res = {};
@@ -324,7 +344,7 @@ public:
         return res;
     }
 
-    /// @brief Fleury_Algorithm ( @b not_recommended )
+    /// @brief Fleury_liked_Algorithm ( @b not_recommended )
     /// @warning @b This_Fleury-liked_function_is_not_recommended
     static std::string
     return_an_euler_circle_F(directed_graph& input, size_t vertex) {
@@ -340,6 +360,8 @@ public:
         }
 
         Tool::Matrix<int> inputDataMat = *(input.DataMat); // copy one
+        Tool::Matrix<int> undirected_DataMat
+            = directed_graph::return_undirected_matrix(input);
 
         // Fleury Algorithm
         size_t curr_vertex           = vertex;
@@ -353,13 +375,20 @@ public:
         ignored_vertex.reserve(num_of_col);
 
         while (num_of_edge > 0) { // must do it ahead (at least for once)
-            path.push(curr_vertex);
-
             size_t curr_in_deg  = inputDataMat.sum_of_col(curr_vertex);
             size_t curr_out_deg = inputDataMat.sum_of_row(curr_vertex);
             size_t curr_deg     = curr_in_deg + curr_out_deg;
+            size_t related_undirected_curr_deg
+                = undirected_DataMat.sum_of_row(curr_vertex);
+
             if (curr_deg == 0) {
                 break;
+            }
+
+            if (curr_in_deg == 0) {
+                // you cannot step into this vertex
+                // then it is `abandoned`
+                ignored_vertex.emplace(curr_vertex);
             }
 
             for (size_t col = 1; col <= num_of_col; ++col) {
@@ -367,28 +396,41 @@ public:
                 if (curr_elem == 0) {
                     continue;
                 } else {
-                    // start to operate
-                    // try to -1 each time and then judge the connectivity
+                    path.push(curr_vertex);
+
                     --inputDataMat(curr_vertex, col);
                     --curr_out_deg;
                     --curr_deg;
                     --num_of_edge;
-                    if (curr_out_deg == 0) { // don't judge the connectivity
+
+                    // do the same in related_undirected_mat
+                    int subbed_value = (curr_vertex == col) ? 2 : 1; // self-ring judgement
+                    undirected_DataMat(curr_vertex, col) -= subbed_value;
+                    undirected_DataMat(col, curr_vertex) -= subbed_value;
+                    related_undirected_curr_deg -= subbed_value;
+
+                    if (related_undirected_curr_deg == 0) { // don't judge the connectivity
                         // that deleted path is the only path for current vertex
                         // then we have to adapt that path, without considering connectivity
-                        /// @attention we need to regard the curr_vertex as discarded
                         ignored_vertex.emplace(curr_vertex);
                         curr_vertex = col;
                         break;
                     } else { // need to judge the connectivity
                         if (!input.if_partial_connective(
-                                inputDataMat,
+                                undirected_DataMat,
                                 ignored_vertex
                             )) {
+                            path.pop();
                             ++inputDataMat(curr_vertex, col);
                             ++curr_out_deg;
                             ++curr_deg;
                             ++num_of_edge;
+
+                            // do the same in related_undirected_mat
+                            undirected_DataMat(curr_vertex, col) += subbed_value;
+                            undirected_DataMat(col, curr_vertex) += subbed_value;
+                            related_undirected_curr_deg += subbed_value;
+
                             continue;
                         }
                         curr_vertex = col;
