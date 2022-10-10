@@ -309,8 +309,8 @@ public:
         return true;
     }
     static constexpr bool A_eq_B(Matrix* A, Matrix* B) {
-#define MatA (*A)
-#define MatB (*B)
+        Matrix<decltype(A->TypeIdentifier)>& MatA = (*A);
+        Matrix<decltype(B->TypeIdentifier)>& MatB = (*B);
         if (!Matrix::assignable(MatA, MatB)) {
             return false;
         }

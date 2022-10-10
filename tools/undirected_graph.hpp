@@ -12,13 +12,9 @@
 #pragma once
 
 #include "Matrix.hpp"
-#include <algorithm>
-#include <memory>
-#include <queue>
 #include <stack>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
@@ -36,7 +32,7 @@ private:
         return Tool::Matrix<int>::if_symmetric_of_main_diagonal(*DataMat);
     }
 
-    size_t return_num_of_edges() {
+    size_t return_num_of_edges() { // undirected_graph
         return DataMat->sum() / 2;
     }
     size_t return_num_of_nodes() {
@@ -49,7 +45,6 @@ public:
             return;
         } else {
             delete DataMat;
-            // delete GraphInfo;
         }
     }
     undirected_graph() = delete; // something has to delete to avoid error
@@ -201,7 +196,7 @@ public:
         }
         return true;
     }
-    static bool if_connective(Tool::Matrix<int>& inputDataMat) {
+    static bool if_connective(Tool::Matrix<int> inputDataMat) {
         auto num_of_nodes = inputDataMat.get_sizeof_row();
         auto final
             = Tool::Matrix<int>::CreateZeroMat(
@@ -274,7 +269,6 @@ public:
         return true;
     }
 
-    /// @brief Hierholzer Algorithm
     /// @brief try to return all euler circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(undirected_graph& input) {
@@ -320,9 +314,6 @@ public:
 
         return res;
     }
-
-    /// @brief Fleury_Algorithm ( @b not_recommended )
-    /// @warning @b This_Fleury-liked_function_is_not_recommended
     static std::vector<std::string>
     return_euler_circle_set_F(undirected_graph& input) {
         std::vector<std::string> res = {};
@@ -345,12 +336,12 @@ public:
 
         return res;
     }
+
+    /// @brief Fleury_Algorithm ( @b not_recommended )
+    /// @warning @b This_Fleury-liked_function_is_not_recommended
     static std::string
     return_an_euler_circle_F(undirected_graph& input, size_t vertex) {
         std::string res = {};
-
-        // res += "Fleury_Algorithm has been discarded! Won't find euler path!";
-        // return res;
 
         if (!input.if_has_euler_circle(input)) {
             res += "NO euler circle! ";
@@ -367,7 +358,7 @@ public:
         size_t curr_vertex           = vertex;
         size_t original_input_vertex = vertex;
         size_t num_of_col            = inputDataMat.get_sizeof_col();
-        size_t num_of_edge           = inputDataMat.sum() / 2;
+        size_t num_of_edge           = input.return_num_of_edges();
 
         std::stack<size_t> path; // res
 
@@ -417,9 +408,16 @@ public:
             }
         };
 
+        std::stack<size_t> true_path;
+
         while (!path.empty()) {
             size_t curr = path.top();
             path.pop();
+            true_path.push(curr);
+        }
+        while (!true_path.empty()) {
+            size_t curr = true_path.top();
+            true_path.pop();
             res += std::to_string(curr);
             res += " -> ";
         }
@@ -432,8 +430,7 @@ public:
                 so you have to add it manually
          * @param res
          */
-        res = std::to_string(vertex) + " -> " + res;
-
+        res += std::to_string(vertex) + " -> ";
         res += "fin. ";
 
         return res;
@@ -499,7 +496,7 @@ public:
     }
 
     /// @brief Hierholzer Algorithm, T(n)=O(n^2)
-    /// @brief take @p if_has_euler_circle's @p if_connective in then T(n)=O(n^2)
+    /// @brief take @p if_has_euler_circle's @p if_connective in then T(n)=O((n^2)*log(n))
     /// @brief This is slower, but easier to comprehend
     /// @e This_one_is_totally_originally_written_by_me
     /// @e Hierholzer_Algorithm_YYDS
@@ -588,9 +585,16 @@ public:
             }
         }
 
+        std::stack<size_t> true_path;
+
         while (!path.empty()) {
             size_t curr = path.top();
             path.pop();
+            true_path.push(curr);
+        }
+        while (!true_path.empty()) {
+            size_t curr = true_path.top();
+            true_path.pop();
             res += std::to_string(curr);
             res += " -> ";
         }
@@ -603,7 +607,7 @@ public:
                 so you have to add it manually
          * @param res
          */
-        res = std::to_string(vertex) + " -> " + res;
+        res += std::to_string(vertex) + " -> ";
         res += "fin. ";
 
         return res;
