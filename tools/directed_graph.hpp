@@ -344,8 +344,50 @@ public:
         return res;
     }
 
-    /// @brief Fleury_liked_Algorithm ( @b not_recommended )
+    /// @brief @b Fleury_liked_Algorithm ( @b not_recommended )
     /// @warning @b This_Fleury-liked_function_is_not_recommended
+    /**
+     * @brief @b Fleury_liked_Algorithm
+     * @note
+            Originally, @e Fleury_algorithm is to @p avoid_passing_the_bridge,
+            but I haven't learnt @e Tarjan_algorithm to figure out the bridge.
+
+            Thus, I made an @p alternation => I've found that
+                ` the edge to broke the @e connectivity of an @b connective_graph `
+            is always the bridge, only if the original graph is an
+                ` @b undirected_connective ` one
+
+            So everything is simple =>
+            1). |
+                |-> In an @e undirected_graph , delete an @b iterable_edge ,
+                    if there's only one, then you need to add the start vertex into
+                        ` @b ignored_vertex_set `.
+                    Then you just judge the @b partial_connectivity of
+                        ` @b {DataMat} @p <sub> @b ignored_vertex `
+                    (a) If it's @b partial_connective , @e OK! , you just go ahead!
+                    (b) Else , that's a wrong edge, you need to add it back
+                        |-> then you should find another  @b iterable_edge
+            2). |
+                |-> In an @e directed_graph , you need to =>
+                    |-> (1) transfer the @b DataMat into an @b Undirected_One
+                        (2) do @p edge_iteration_with_deletion in
+                                ` @b Undirected_Mat ` and ` @b Directed(Original)_Mat `
+                            @p AT_THE_SAME_TIME
+                        (3) @b ONLY_USE the @b Undirected_Mat for
+                                (a) @p BUILD @b ignored_vertex_set
+                                (b) @p JUDGE @b partial_connectivity
+
+            But, T(n) = O( (n^2) * log(n) ) [ @b A_BIG_COST ]
+                            ^^^    ^^^^^^
+                            |           |==> Quick_Power
+                            |==> Fast Matrix Multiply
+
+            Hope You could @p Enjoy! @b ~~(^ω^)~~
+
+     * @param input
+     * @param vertex
+     * @return std::string
+     */
     static std::string
     return_an_euler_circle_F(directed_graph& input, size_t vertex) {
         std::string res = {};
