@@ -44,9 +44,8 @@ class Matrix {
     friend class info;
 
 private:
-    std::vector<std::vector<T>>
-                   Data;
-    std::vector<T> RowCache;
+    std::vector<std::vector<T>> Data;
+    std::vector<T>              RowCache;
 
     T      TypeIdentifier;
     size_t SizeOf_Row    = 0;
