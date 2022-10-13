@@ -1,6 +1,7 @@
 # Xmake cache
 .xmake/
 build/
+.vscode/
 
 # personal doc
 latex_doc/
