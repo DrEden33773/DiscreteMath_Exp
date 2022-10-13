@@ -2,6 +2,9 @@
 .xmake/
 build/
 
+# personal doc
+latex_doc/
+
 # MacOS Cache
 .DS_Store
 
