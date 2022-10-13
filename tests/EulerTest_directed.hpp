@@ -49,7 +49,7 @@ void EulerTest_directed() {
     }
     std::cout << std::endl;
 
-    /// @brief @b Fleury
+    /// @brief @b Fleury_like
     auto F
         = directed_graph::return_euler_circle_set_F(Nontrivial_Test);
     for (auto&& vec : F) {
@@ -89,7 +89,7 @@ void EulerTest_directed() {
     }
     std::cout << std::endl;
 
-    /// @brief @b Fleury
+    /// @brief @b Fleury_like
     auto F_trivial
         = directed_graph::return_euler_circle_set_F(Trivial_Test);
     for (auto&& vec : F_trivial) {
