@@ -240,18 +240,19 @@ public:
 
         return res;
     }
-    static constexpr auto A_multiply_B(Matrix& A, arithmetic auto B)
+    template <typename I>
+    requires arithmetic<I>
+    static constexpr auto A_multiply_B(Matrix& A, I B)
         -> Matrix<decltype(B)> {
         assert(!ifEmpty(A));
 
-        using NewType = decltype(B);
-        auto res      = Matrix<NewType>::CreateZeroMat(
+        auto res = Matrix<I>::CreateZeroMat(
             A.SizeOf_Row,
             A.SizeOf_Column
         );
         for (int row = 1; row <= A.SizeOf_Row; ++row) {
             for (int col = 1; col <= A.SizeOf_Column; ++col) {
-                res(row, col) = static_cast<NewType>(A(row, col)) * B;
+                res(row, col) = static_cast<I>(A(row, col)) * B;
             }
         }
         return res;
