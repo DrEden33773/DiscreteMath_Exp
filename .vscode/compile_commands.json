@@ -1,6 +1,19 @@
 [
-{
-  "directory": "/home/eden/CollegeLearningRepo/DiscreteMath_Exp",
-  "arguments": ["/usr/bin/clang", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=gnu++2b", "-I/usr/include", "-I/usr/local/include", "-o", "build/.objs/DiscreteMath_Exp/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
-  "file": "src/main.cpp"
-}]
+  {
+    "directory": "/home/eden/CollegeLearningRepo/DiscreteMath_Exp",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-m64",
+      "-g",
+      "-O0",
+      "-std=gnu++23",
+      "-I/usr/include",
+      "-I/usr/local/include",
+      "-o",
+      "build/.objs/DiscreteMath_Exp/linux/x86_64/debug/src/main.cpp.o",
+      "src/main.cpp"
+    ],
+    "file": "src/main.cpp"
+  }
+]
