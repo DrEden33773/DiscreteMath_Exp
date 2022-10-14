@@ -291,7 +291,7 @@ public:
     }
 
     /// @brief methods about iterating of vertex and edge
-    constexpr size_t return_first_iterable(
+    static constexpr size_t return_first_iterable(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
     ) {
@@ -304,7 +304,7 @@ public:
         }
         return res;
     }
-    void cut_an_edge_of(
+    static void cut_an_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -316,7 +316,7 @@ public:
         int subbed_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) -= subbed_value;
     }
-    size_t cut_first_iterable_edge_of(
+    static size_t cut_first_iterable_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
     ) {
@@ -583,21 +583,25 @@ public:
                 // curr_vertex can reach other vertex
                 // we haven't found the ring
                 path.push(curr_vertex);
-                size_t next_vertex = curr_vertex;
-                for (size_t col = 1; col <= num_of_col; ++col) {
-                    auto curr_edge_num = inputDataMat(curr_vertex, col);
-                    if (curr_edge_num > 0) {
-                        if (col == curr_vertex) {
-                            inputDataMat(curr_vertex, col) -= 2;
-                            inputDataMat(col, curr_vertex) -= 2;
-                        } else {
-                            --inputDataMat(curr_vertex, col);
-                            --inputDataMat(col, curr_vertex);
-                        }
-                        next_vertex = col;
-                        break;
-                    }
-                }
+                // size_t next_vertex = curr_vertex;
+                // for (size_t col = 1; col <= num_of_col; ++col) {
+                //     auto curr_edge_num = inputDataMat(curr_vertex, col);
+                //     if (curr_edge_num > 0) {
+                //         if (col == curr_vertex) {
+                //             inputDataMat(curr_vertex, col) -= 2;
+                //             inputDataMat(col, curr_vertex) -= 2;
+                //         } else {
+                //             --inputDataMat(curr_vertex, col);
+                //             --inputDataMat(col, curr_vertex);
+                //         }
+                //         next_vertex = col;
+                //         break;
+                //     }
+                // }
+                // curr_vertex = next_vertex;
+                size_t next_vertex
+                    = return_first_iterable(inputDataMat, curr_vertex);
+                cut_an_edge_of(inputDataMat, curr_vertex, next_vertex);
                 curr_vertex = next_vertex;
             } else {
                 // curr_vertex cannot reach another vertex
