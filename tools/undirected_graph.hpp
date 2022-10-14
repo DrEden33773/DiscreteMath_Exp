@@ -596,7 +596,6 @@ public:
             if (curr_deg == 0) {
                 break;
             }
-
             for (size_t col = 1; col <= num_of_col; ++col) {
                 auto& curr_elem = inputDataMat(curr_vertex, col);
                 if (curr_elem == 0) {
@@ -632,42 +631,6 @@ public:
                         break;
                     }
                 }
-            }
-
-            size_t next_vertex = return_first_iterable(
-                inputDataMat,
-                curr_vertex
-            );
-            cut_an_undirected_edge_of(
-                inputDataMat,
-                curr_vertex,
-                next_vertex
-            );
-            curr_deg = inputDataMat.sum_of_row(curr_vertex);
-            --num_of_edge;
-            if (curr_deg == 0) { // don't judge the connectivity
-                // that deleted path is the only path for current vertex
-                // then we have to adapt that path, without considering connectivity
-                ignored_vertex.emplace(curr_vertex);
-                curr_vertex = next_vertex;
-                break;
-            } else { // need to judge the connectivity
-                if (!input.if_partial_connective(
-                        inputDataMat,
-                        ignored_vertex
-                    )) {
-                    path.pop();
-                    add_an_undirected_edge_of(
-                        inputDataMat,
-                        curr_vertex,
-                        next_vertex
-                    );
-                    curr_deg = inputDataMat.sum_of_row(curr_vertex);
-                    ++num_of_edge;
-                    continue;
-                }
-                curr_vertex = next_vertex;
-                break;
             }
         };
 
@@ -727,22 +690,6 @@ public:
                 // curr_vertex can reach other vertex
                 // we haven't found the ring
                 path.push(curr_vertex);
-                // size_t next_vertex = curr_vertex;
-                // for (size_t col = 1; col <= num_of_col; ++col) {
-                //     auto curr_edge_num = inputDataMat(curr_vertex, col);
-                //     if (curr_edge_num > 0) {
-                //         if (col == curr_vertex) {
-                //             inputDataMat(curr_vertex, col) -= 2;
-                //             inputDataMat(col, curr_vertex) -= 2;
-                //         } else {
-                //             --inputDataMat(curr_vertex, col);
-                //             --inputDataMat(col, curr_vertex);
-                //         }
-                //         next_vertex = col;
-                //         break;
-                //     }
-                // }
-                // curr_vertex = next_vertex;
                 size_t next_vertex = return_first_iterable(
                     inputDataMat,
                     curr_vertex

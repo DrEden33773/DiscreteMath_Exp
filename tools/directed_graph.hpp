@@ -570,6 +570,7 @@ public:
             size_t curr_in_deg  = inputDataMat.sum_of_col(curr_vertex);
             size_t curr_out_deg = inputDataMat.sum_of_row(curr_vertex);
             size_t curr_deg     = curr_in_deg + curr_out_deg;
+
             size_t related_undirected_curr_deg
                 = undirected_DataMat.sum_of_row(curr_vertex);
 
@@ -690,15 +691,15 @@ public:
                 // curr_vertex is not alone
                 // we haven't found the ring
                 path.push(curr_vertex);
-                size_t next_vertex = curr_vertex;
-                for (size_t col = 1; col <= num_of_col; ++col) {
-                    auto curr_edge_num = inputDataMat(curr_vertex, col);
-                    if (curr_edge_num > 0) {
-                        --inputDataMat(curr_vertex, col);
-                        next_vertex = col;
-                        break;
-                    }
-                }
+                size_t next_vertex = return_first_iterable(
+                    inputDataMat,
+                    curr_vertex
+                );
+                cut_an_directed_edge_of(
+                    inputDataMat,
+                    curr_vertex,
+                    next_vertex
+                );
                 curr_vertex = next_vertex;
             } else {
                 // curr_vertex is alone
@@ -774,28 +775,30 @@ public:
             size_t curr_out_deg = inputDataMat.sum_of_row(curr_vertex);
             size_t curr_deg     = curr_in_deg + curr_out_deg;
             if (curr_deg > 0) {
-                // curr_vertex is not alone
+                // curr_vertex can reach other vertex
                 // we haven't found the ring
                 path.push(curr_vertex);
-                size_t next_vertex = curr_vertex; // only as default value
-                for (size_t col = 1; col <= num_of_col; ++col) {
-                    auto curr_edge_num = inputDataMat(curr_vertex, col);
-                    if (curr_edge_num > 0) {
-                        // remove edge
-                        --inputDataMat(curr_vertex, col);
-                        // update the compensated (if not used, it's OK)
-                        compensated_vertex = curr_vertex;
-                        compensated_col    = col;
-                        // update vertex
-                        next_vertex = col;
-                        break;
-                    }
-                }
-                curr_vertex = next_vertex;
-                --curr_edge_sum; // update sum_of_edge
+                size_t next_vertex = return_first_iterable(
+                    inputDataMat,
+                    curr_vertex
+                );
+                cut_an_directed_edge_of(
+                    inputDataMat,
+                    curr_vertex,
+                    next_vertex
+                );
+                compensated_vertex = curr_vertex;
+                compensated_col    = next_vertex;
+                curr_vertex        = next_vertex;
+                // update sum_of_edge
+                --curr_edge_sum;
                 if (if_compensate) {
                     // relink the edge
-                    ++inputDataMat(compensated_vertex, compensated_col);
+                    add_an_directed_edge_of(
+                        inputDataMat,
+                        compensated_vertex,
+                        compensated_col
+                    );
                     // compensate sum_of_edge
                     ++curr_edge_sum;
                     // reset the compensate flag
