@@ -296,15 +296,16 @@ public:
         size_t             vertex
     ) {
         size_t res        = 0;
-        size_t num_of_col = inputDataMat.get_sizeof_row();
-        for (size_t col = 1; col < num_of_col; ++col) {
+        size_t num_of_col = inputDataMat.get_sizeof_col();
+        for (size_t col = 1; col <= num_of_col; ++col) {
             if (inputDataMat(vertex, col) != 0) {
                 res = col;
+                break;
             }
         }
         return res;
     }
-    static void cut_an_edge_of(
+    static void cut_an_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -315,19 +316,50 @@ public:
         }
         int subbed_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) -= subbed_value;
+        inputDataMat(col, vertex) -= subbed_value;
     }
-    static size_t cut_first_iterable_edge_of(
+    static void cut_an_directed_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex,
+        size_t             col
+    ) {
+        size_t num_of_col = inputDataMat.get_sizeof_row();
+        if (inputDataMat(vertex, col) == 0) {
+            throw std::logic_error("No edge between two vertexes!");
+        }
+        int subbed_value = 1;
+        inputDataMat(vertex, col) -= subbed_value;
+    }
+    static size_t cut_first_iterable_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
     ) {
         size_t res_col    = 0;
         size_t num_of_col = inputDataMat.get_sizeof_row();
-        for (size_t col = 1; col < num_of_col; ++col) {
+        for (size_t col = 1; col <= num_of_col; ++col) {
             if (inputDataMat(vertex, col) != 0) {
                 res_col = col;
+                break;
             }
         }
         int subbed_value = (vertex == res_col) ? 2 : 1;
+        inputDataMat(vertex, res_col) -= subbed_value;
+        inputDataMat(res_col, vertex) -= subbed_value;
+        return res_col; // return value could be discarded
+    }
+    static size_t cut_first_iterable_directed_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex
+    ) {
+        size_t res_col    = 0;
+        size_t num_of_col = inputDataMat.get_sizeof_row();
+        for (size_t col = 1; col <= num_of_col; ++col) {
+            if (inputDataMat(vertex, col) != 0) {
+                res_col = col;
+                break;
+            }
+        }
+        int subbed_value = 1;
         inputDataMat(vertex, res_col) -= subbed_value;
         return res_col; // return value could be discarded
     }
@@ -601,7 +633,7 @@ public:
                 // curr_vertex = next_vertex;
                 size_t next_vertex
                     = return_first_iterable(inputDataMat, curr_vertex);
-                cut_an_edge_of(inputDataMat, curr_vertex, next_vertex);
+                cut_an_undirected_edge_of(inputDataMat, curr_vertex, next_vertex);
                 curr_vertex = next_vertex;
             } else {
                 // curr_vertex cannot reach another vertex
