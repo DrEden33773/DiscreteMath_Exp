@@ -316,6 +316,25 @@ public:
         int subbed_value = 1;
         inputDataMat(vertex, col) -= subbed_value;
     }
+    static void add_an_undirected_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex,
+        size_t             col
+    ) {
+        size_t num_of_col  = inputDataMat.get_sizeof_row();
+        int    added_value = (vertex == col) ? 2 : 1;
+        inputDataMat(vertex, col) += added_value;
+        inputDataMat(col, vertex) += added_value;
+    }
+    static void add_an_directed_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex,
+        size_t             col
+    ) {
+        size_t num_of_col  = inputDataMat.get_sizeof_row();
+        int    added_value = 1;
+        inputDataMat(vertex, col) += added_value;
+    }
     static size_t cut_first_iterable_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
