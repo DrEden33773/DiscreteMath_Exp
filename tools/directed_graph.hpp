@@ -277,6 +277,13 @@ public:
     }
 
     /// @brief methods about iterating of vertex and edge
+    /**
+     * @brief return first iterable vertex
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static constexpr size_t return_first_iterable(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
@@ -291,7 +298,15 @@ public:
         }
         return res;
     }
-    static void cut_an_undirected_edge_of(
+    /**
+     * @brief cut_an_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b subbed_value
+     */
+    static size_t cut_an_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -303,8 +318,17 @@ public:
         int subbed_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) -= subbed_value;
         inputDataMat(col, vertex) -= subbed_value;
+        return subbed_value;
     }
-    static void cut_an_directed_edge_of(
+    /**
+     * @brief cut_an_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b subbed_value
+     */
+    static size_t cut_an_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -315,8 +339,17 @@ public:
         }
         int subbed_value = 1;
         inputDataMat(vertex, col) -= subbed_value;
+        return subbed_value;
     }
-    static void add_an_undirected_edge_of(
+    /**
+     * @brief add_an_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b added_value
+     */
+    static size_t add_an_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -325,8 +358,17 @@ public:
         int    added_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) += added_value;
         inputDataMat(col, vertex) += added_value;
+        return added_value;
     }
-    static void add_an_directed_edge_of(
+    /**
+     * @brief add_an_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b added_value
+     */
+    static size_t add_an_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -334,7 +376,15 @@ public:
         size_t num_of_col  = inputDataMat.get_sizeof_row();
         int    added_value = 1;
         inputDataMat(vertex, col) += added_value;
+        return added_value;
     }
+    /**
+     * @brief cut_first_iterable_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static size_t cut_first_iterable_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
@@ -352,6 +402,13 @@ public:
         inputDataMat(res_col, vertex) -= subbed_value;
         return res_col; // return value could be discarded
     }
+    /**
+     * @brief cut_first_iterable_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static size_t cut_first_iterable_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex

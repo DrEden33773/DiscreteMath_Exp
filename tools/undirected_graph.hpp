@@ -291,6 +291,13 @@ public:
     }
 
     /// @brief methods about iterating of vertex and edge
+    /**
+     * @brief return first iterable vertex
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static constexpr size_t return_first_iterable(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
@@ -305,7 +312,15 @@ public:
         }
         return res;
     }
-    static void cut_an_undirected_edge_of(
+    /**
+     * @brief cut_an_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b subbed_value
+     */
+    static size_t cut_an_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -317,8 +332,17 @@ public:
         int subbed_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) -= subbed_value;
         inputDataMat(col, vertex) -= subbed_value;
+        return subbed_value;
     }
-    static void cut_an_directed_edge_of(
+    /**
+     * @brief cut_an_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b subbed_value
+     */
+    static size_t cut_an_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -329,8 +353,17 @@ public:
         }
         int subbed_value = 1;
         inputDataMat(vertex, col) -= subbed_value;
+        return subbed_value;
     }
-    static void add_an_undirected_edge_of(
+    /**
+     * @brief add_an_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b added_value
+     */
+    static size_t add_an_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -339,8 +372,17 @@ public:
         int    added_value = (vertex == col) ? 2 : 1;
         inputDataMat(vertex, col) += added_value;
         inputDataMat(col, vertex) += added_value;
+        return added_value;
     }
-    static void add_an_directed_edge_of(
+    /**
+     * @brief add_an_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @param col
+     * @return size_t @b added_value
+     */
+    static size_t add_an_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex,
         size_t             col
@@ -348,7 +390,15 @@ public:
         size_t num_of_col  = inputDataMat.get_sizeof_row();
         int    added_value = 1;
         inputDataMat(vertex, col) += added_value;
+        return added_value;
     }
+    /**
+     * @brief cut_first_iterable_undirected_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static size_t cut_first_iterable_undirected_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
@@ -366,6 +416,13 @@ public:
         inputDataMat(res_col, vertex) -= subbed_value;
         return res_col; // return value could be discarded
     }
+    /**
+     * @brief cut_first_iterable_directed_edge_of
+     *
+     * @param inputDataMat
+     * @param vertex
+     * @return size_t @b first_iterable_vertex
+     */
     static size_t cut_first_iterable_directed_edge_of(
         Tool::Matrix<int>& inputDataMat,
         size_t             vertex
@@ -576,6 +633,42 @@ public:
                     }
                 }
             }
+
+            size_t next_vertex = return_first_iterable(
+                inputDataMat,
+                curr_vertex
+            );
+            cut_an_undirected_edge_of(
+                inputDataMat,
+                curr_vertex,
+                next_vertex
+            );
+            curr_deg = inputDataMat.sum_of_row(curr_vertex);
+            --num_of_edge;
+            if (curr_deg == 0) { // don't judge the connectivity
+                // that deleted path is the only path for current vertex
+                // then we have to adapt that path, without considering connectivity
+                ignored_vertex.emplace(curr_vertex);
+                curr_vertex = next_vertex;
+                break;
+            } else { // need to judge the connectivity
+                if (!input.if_partial_connective(
+                        inputDataMat,
+                        ignored_vertex
+                    )) {
+                    path.pop();
+                    add_an_undirected_edge_of(
+                        inputDataMat,
+                        curr_vertex,
+                        next_vertex
+                    );
+                    curr_deg = inputDataMat.sum_of_row(curr_vertex);
+                    ++num_of_edge;
+                    continue;
+                }
+                curr_vertex = next_vertex;
+                break;
+            }
         };
 
         std::stack<size_t> true_path;
@@ -650,9 +743,15 @@ public:
                 //     }
                 // }
                 // curr_vertex = next_vertex;
-                size_t next_vertex
-                    = return_first_iterable(inputDataMat, curr_vertex);
-                cut_an_undirected_edge_of(inputDataMat, curr_vertex, next_vertex);
+                size_t next_vertex = return_first_iterable(
+                    inputDataMat,
+                    curr_vertex
+                );
+                cut_an_undirected_edge_of(
+                    inputDataMat,
+                    curr_vertex,
+                    next_vertex
+                );
                 curr_vertex = next_vertex;
             } else {
                 // curr_vertex cannot reach another vertex
@@ -729,32 +828,27 @@ public:
                 // curr_vertex can reach other vertex
                 // we haven't found the ring
                 path.push(curr_vertex);
-                size_t next_vertex = curr_vertex; // only as default value
-                for (size_t col = 1; col <= num_of_col; ++col) {
-                    auto curr_edge_num = inputDataMat(curr_vertex, col);
-                    if (curr_edge_num > 0) {
-                        // remove edge
-                        if (col == curr_vertex) { // cut a self ring
-                            inputDataMat(curr_vertex, col) -= 2;
-                            inputDataMat(col, curr_vertex) -= 2;
-                        } else {
-                            --inputDataMat(curr_vertex, col);
-                            --inputDataMat(col, curr_vertex);
-                        }
-                        // update the compensated (if not used, it's OK)
-                        compensated_vertex = curr_vertex;
-                        compensated_col    = col;
-                        // update vertex
-                        next_vertex = col;
-                        break;
-                    }
-                }
-                curr_vertex = next_vertex;
-                --curr_edge_sum; // update sum_of_edge
+                size_t next_vertex = return_first_iterable(
+                    inputDataMat,
+                    curr_vertex
+                );
+                cut_an_undirected_edge_of(
+                    inputDataMat,
+                    curr_vertex,
+                    next_vertex
+                );
+                compensated_vertex = curr_vertex;
+                compensated_col    = next_vertex;
+                curr_vertex        = next_vertex;
+                // update sum_of_edge
+                --curr_edge_sum;
                 if (if_compensate) {
                     // relink the edge
-                    ++inputDataMat(compensated_vertex, compensated_col);
-                    ++inputDataMat(compensated_col, compensated_vertex);
+                    add_an_undirected_edge_of(
+                        inputDataMat,
+                        compensated_vertex,
+                        compensated_col
+                    );
                     // compensate sum_of_edge
                     ++curr_edge_sum;
                     // reset the compensate flag
