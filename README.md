@@ -6,7 +6,7 @@ This is a repository for __Discrete Math__ experiments. The experiments are writ
 
 ## What Cpp standard have I used?
 
-*__CPP23(cxxlatest)__*, but don't worry, mainly features apperps in *__CPP20__*
+*__CPP23(cxxlatest)__*, but don't worry, mainly features appears in *__CPP20__*
 
 that means you could compile this project in __CPP20__, too
 

@@ -276,6 +276,48 @@ public:
         return true;
     }
 
+    /// @brief methods about iterating of vertex and edge
+    constexpr size_t return_first_iterable(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex
+    ) {
+        size_t res        = 0;
+        size_t num_of_col = inputDataMat.get_sizeof_row();
+        for (size_t col = 1; col < num_of_col; ++col) {
+            if (inputDataMat(vertex, col) != 0) {
+                res = col;
+            }
+        }
+        return res;
+    }
+    void cut_an_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex,
+        size_t             col
+    ) {
+        size_t num_of_col = inputDataMat.get_sizeof_row();
+        if (inputDataMat(vertex, col) == 0) {
+            throw std::logic_error("No edge between two vertexes!");
+        }
+        int subbed_value = (vertex == col) ? 2 : 1;
+        inputDataMat(vertex, col) -= subbed_value;
+    }
+    size_t cut_first_iterable_edge_of(
+        Tool::Matrix<int>& inputDataMat,
+        size_t             vertex
+    ) {
+        size_t res_col    = 0;
+        size_t num_of_col = inputDataMat.get_sizeof_row();
+        for (size_t col = 1; col < num_of_col; ++col) {
+            if (inputDataMat(vertex, col) != 0) {
+                res_col = col;
+            }
+        }
+        int subbed_value = (vertex == res_col) ? 2 : 1;
+        inputDataMat(vertex, res_col) -= subbed_value;
+        return res_col; // return value could be discarded
+    }
+
     /// @brief try to return @e all @b euler_circle
     static std::vector<std::string>
     return_euler_circle_set_H_fastest(directed_graph& input) {
