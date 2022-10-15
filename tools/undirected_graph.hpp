@@ -48,10 +48,10 @@ private:
         return if_ok;
     }
 
-    size_t return_num_of_edges() { // undirected_graph
+    constexpr size_t return_num_of_edges() { // undirected_graph
         return DataMat->sum() / 2;
     }
-    size_t return_num_of_nodes() {
+    constexpr size_t return_num_of_nodes() {
         return DataMat->get_sizeof_row();
     }
 

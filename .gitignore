@@ -11,4 +11,7 @@ latex_doc/
 # MacOS Cache
 .DS_Store
 
+# Report
+REPORT.md
+
 

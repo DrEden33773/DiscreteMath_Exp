@@ -474,7 +474,7 @@ public:
         }
         std::cout << std::endl;
     }
-    T sum() {
+    constexpr T sum() {
         assert(!ifEmpty(*this));
         T res = Data[0][0];
         for (auto& currRow : Data) {
@@ -485,7 +485,7 @@ public:
         res -= Data[0][0];
         return res;
     }
-    T sum_of_row(size_t input_row) {
+    constexpr T sum_of_row(size_t input_row) {
         if (input_row > SizeOf_Row) {
             throw std::out_of_range("input row > SizeOf row");
         }
@@ -500,7 +500,7 @@ public:
         res -= Data[0][0];
         return res;
     }
-    T sum_of_col(size_t input_col) {
+    constexpr T sum_of_col(size_t input_col) {
         if (input_col > SizeOf_Column) {
             throw std::out_of_range("input col > SizeOf col");
         }
