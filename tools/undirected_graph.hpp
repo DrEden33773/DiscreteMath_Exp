@@ -602,12 +602,13 @@ public:
                     continue;
                 } else {
                     path.push(curr_vertex);
-                    // start to operate
                     // try to -1 each time and then judge the connectivity
-                    int subbed_value = (curr_vertex == col) ? 2 : 1; // self-ring judgement
-                    inputDataMat(curr_vertex, col) -= subbed_value;
-                    inputDataMat(col, curr_vertex) -= subbed_value;
-                    curr_deg -= subbed_value;
+                    size_t subbed = cut_an_undirected_edge_of(
+                        inputDataMat,
+                        curr_vertex,
+                        col
+                    );
+                    curr_deg -= subbed;
                     --num_of_edge;
                     if (curr_deg == 0) { // don't judge the connectivity
                         // that deleted path is the only path for current vertex
@@ -621,9 +622,12 @@ public:
                                 ignored_vertex
                             )) {
                             path.pop();
-                            inputDataMat(curr_vertex, col) += subbed_value;
-                            inputDataMat(col, curr_vertex) += subbed_value;
-                            curr_deg += subbed_value;
+                            add_an_undirected_edge_of(
+                                inputDataMat,
+                                curr_vertex,
+                                col
+                            );
+                            curr_deg += subbed;
                             ++num_of_edge;
                             continue;
                         }

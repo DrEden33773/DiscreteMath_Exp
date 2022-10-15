@@ -578,12 +578,6 @@ public:
                 break;
             }
 
-            if (curr_in_deg == 0) {
-                // you cannot step into this vertex
-                // then it is `abandoned`
-                ignored_vertex.emplace(curr_vertex);
-            }
-
             for (size_t col = 1; col <= num_of_col; ++col) {
                 auto& curr_elem = inputDataMat(curr_vertex, col);
                 if (curr_elem == 0) {
@@ -591,15 +585,21 @@ public:
                 } else {
                     path.push(curr_vertex);
 
-                    --inputDataMat(curr_vertex, col);
+                    cut_an_directed_edge_of(
+                        inputDataMat,
+                        curr_vertex,
+                        col
+                    );
                     --curr_out_deg;
                     --curr_deg;
                     --num_of_edge;
 
                     // do the same in related_undirected_mat
-                    int subbed_value = (curr_vertex == col) ? 2 : 1; // self-ring judgement
-                    undirected_DataMat(curr_vertex, col) -= subbed_value;
-                    undirected_DataMat(col, curr_vertex) -= subbed_value;
+                    size_t subbed_value = cut_an_undirected_edge_of(
+                        undirected_DataMat,
+                        curr_vertex,
+                        col
+                    );
                     related_undirected_curr_deg -= subbed_value;
 
                     if (related_undirected_curr_deg == 0) { // don't judge the connectivity
@@ -614,14 +614,22 @@ public:
                                 ignored_vertex
                             )) {
                             path.pop();
-                            ++inputDataMat(curr_vertex, col);
+
+                            add_an_directed_edge_of(
+                                inputDataMat,
+                                curr_vertex,
+                                col
+                            );
                             ++curr_out_deg;
                             ++curr_deg;
                             ++num_of_edge;
 
                             // do the same in related_undirected_mat
-                            undirected_DataMat(curr_vertex, col) += subbed_value;
-                            undirected_DataMat(col, curr_vertex) += subbed_value;
+                            add_an_undirected_edge_of(
+                                undirected_DataMat,
+                                curr_vertex,
+                                col
+                            );
                             related_undirected_curr_deg += subbed_value;
 
                             continue;
