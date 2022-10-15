@@ -4,10 +4,6 @@ target("DiscreteMath_Exp")
     set_kind("binary")
     add_files("src/*.cpp")
     set_languages("clatest", "gnuxxlatest")
-    if is_plat("linux", "macosx") then
-        add_includedirs("/usr/include", "/usr/local/include")
-        add_linkdirs("/usr/local/lib", "/usr/lib")
-    end
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io

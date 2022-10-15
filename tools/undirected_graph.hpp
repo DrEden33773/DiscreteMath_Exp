@@ -666,7 +666,7 @@ public:
         return res;
     }
 
-    /// @brief Hierholzer Algorithm, T(n)=O(n^2), fastest
+    /// @brief Hierholzer Algorithm, T(n)=O(n), fastest
     /// @ref https://www.jianshu.com/p/8394b8e5b878
     /// @attention this is a reference, not the original work of me!
     static std::string
@@ -724,9 +724,8 @@ public:
         return res;
     }
 
-    /// @brief Hierholzer Algorithm, T(n)=O(n^2)
-    /// @brief take @p if_has_euler_circle's @p if_connective in then T(n)=O((n^2)*log(n))
-    /// @brief This is slower, but easier to comprehend
+    /// @brief Hierholzer Algorithm, T(n)=O(n)
+    /// @brief This one may be slower, but it's easier to comprehend
     /// @e This_one_is_totally_originally_written_by_me
     /// @e Hierholzer_Algorithm_YYDS
     static std::string
