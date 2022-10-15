@@ -189,7 +189,7 @@ public:
                     if_symmetric_of_main_diagonal(TheMatRef)) {
                 graph_type = Graph::Type::directed;
                 std::cout << std::endl;
-                std::cout << "Type of Graph is Automatically-Judged as {directed_graph} " << std::endl;
+                std::cout << "Type of Graph is restricted as {directed_graph} " << std::endl;
             } else {
                 if_need_to_confirm_type = true;
             }

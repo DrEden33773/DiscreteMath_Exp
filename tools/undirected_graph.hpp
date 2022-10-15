@@ -329,7 +329,7 @@ public:
         if (inputDataMat(vertex, col) == 0) {
             throw std::logic_error("No edge between two vertexes!");
         }
-        int subbed_value = (vertex == col) ? 2 : 1;
+        int subbed_value = 1;
         inputDataMat(vertex, col) -= subbed_value;
         inputDataMat(col, vertex) -= subbed_value;
         return subbed_value;
@@ -369,7 +369,7 @@ public:
         size_t             col
     ) {
         size_t num_of_col  = inputDataMat.get_sizeof_row();
-        int    added_value = (vertex == col) ? 2 : 1;
+        int    added_value = 1;
         inputDataMat(vertex, col) += added_value;
         inputDataMat(col, vertex) += added_value;
         return added_value;
@@ -411,7 +411,7 @@ public:
                 break;
             }
         }
-        int subbed_value = (vertex == res_col) ? 2 : 1;
+        int subbed_value = 1;
         inputDataMat(vertex, res_col) -= subbed_value;
         inputDataMat(res_col, vertex) -= subbed_value;
         return res_col; // return value could be discarded
