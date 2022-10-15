@@ -99,6 +99,50 @@ void EulerTest_undirected() {
         std::cout << std::endl;
     }
     std::cout << std::endl;
+
+    /**
+     * @brief test of @b un_trivial
+     * @param Trivial_Test
+     */
+
+    undirected_graph UnEuler_Test = {
+        { 0, 1, 1 },
+        { 1, 0, 2 },
+        { 1, 2, 0 },
+    };
+
+    /// @brief @b Hierholzer_Fastest
+    auto H_fastest_UnEuler
+        = undirected_graph::return_euler_circle_set_H_fastest(UnEuler_Test);
+    for (auto&& vec : H_fastest_UnEuler) {
+        for (auto&& str : vec) {
+            std::cout << str;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    /// @brief @b Hierholzer_Purely_Self_Constructed
+    auto H_UnEuler
+        = undirected_graph::return_euler_circle_set_H(UnEuler_Test);
+    for (auto&& vec : H_UnEuler) {
+        for (auto&& str : vec) {
+            std::cout << str;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    /// @brief @b Fleury
+    auto F_UnEuler
+        = undirected_graph::return_euler_circle_set_F(UnEuler_Test);
+    for (auto&& vec : F_UnEuler) {
+        for (auto&& str : vec) {
+            std::cout << str;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 } // namespace Test
