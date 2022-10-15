@@ -41,6 +41,18 @@ class Graph {
     undirected_graph* undirected = nullptr;
     Type              graph_type = Type::directed; // default as directed
 
+public:
+    std::string return_graph_type() {
+        std::string res;
+        if (this->graph_type == Type::directed) {
+            res = "directed_graph";
+        } else {
+            res = "undirected_graph";
+        }
+        return res;
+    }
+
+private:
     Graph(std::vector<std::vector<int>>&& initMat, Type type_of_graph) {
         using origin = std::vector<std::vector<int>>;
         graph_type   = type_of_graph;
