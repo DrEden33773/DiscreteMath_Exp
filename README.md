@@ -18,7 +18,7 @@ that means you could compile this project in __CPP20__, too
 
 0. Make sure you've installed one of the toolchain below
 
-- [MSVC(14.0)](https://visualstudio.microsoft.com/ko/downloads/)
+- [MSVC(14.0)](https://visualstudio.microsoft.com/downloads/)
 - [GCC(11.0)](https://gcc.gnu.org/)
 - [Clang(15.0)](https://clang.llvm.org/)
 
