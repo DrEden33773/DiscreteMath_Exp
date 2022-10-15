@@ -20,5 +20,21 @@
  *
  */
 
+#pragma once
+#include "../tools/Matrix.hpp"
+#include "../tools/directed_graph.hpp"
+#include "../tools/undirected_graph.hpp"
+
 class GraphFactory {
+    enum class graph_type : unsigned short {
+        undirected = 0,
+        directed   = 1,
+    };
+    GraphFactory() = default;
+
+public:
+    ~GraphFactory() = default;
+
+    static GraphFactory CreateGraphInterface() {
+    }
 };
