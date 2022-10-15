@@ -11,6 +11,7 @@
             @b RULE_OF_JUDGE:
                 @b if the @e Matrix is @b Non_Symmetrical => @p Restricted_as @e directed
                 @b if the @e Matrix is @b {{0}} => @p Restricted_as @e Undirected
+                @b if the @e Matrix is @b {{2n+1}} => @p Restricted_as @e directed
                 @b if the @e Matrix is @b Axially_Symmetrical => @p Judged_as @e Undirected
                     @b if you've @p designated the @e type => @p Abandon_Judgement
 
@@ -65,9 +66,9 @@ public:
         std::vector<std::string> res;
 
         if (graph_type == Type::undirected) {
-            res = directed_graph::return_euler_circle_set_H(*directed);
-        } else {
             res = undirected_graph::return_euler_circle_set_H(*undirected);
+        } else {
+            res = directed_graph::return_euler_circle_set_H(*directed);
         }
 
         return res;
@@ -83,9 +84,9 @@ public:
         std::vector<std::string> res;
 
         if (graph_type == Type::undirected) {
-            res = directed_graph::return_euler_circle_set_F(*directed);
+            res = undirected_graph::return_euler_circle_set_H(*undirected);
         } else {
-            res = undirected_graph::return_euler_circle_set_F(*undirected);
+            res = directed_graph::return_euler_circle_set_H(*directed);
         }
 
         return res;
@@ -95,7 +96,6 @@ public:
         std::vector<std::string> output;
         output = this->return_euler_circle_set_H();
 
-        std::cout << std::endl;
         for (auto&& vec : output) {
             for (auto&& str : vec) {
                 std::cout << str;
@@ -109,7 +109,6 @@ public:
         std::vector<std::string> output;
         output = this->return_euler_circle_set_F();
 
-        std::cout << std::endl;
         for (auto&& vec : output) {
             for (auto&& str : vec) {
                 std::cout << str;
@@ -126,7 +125,7 @@ class GraphFactory {
         size_t col = inputMat.get_sizeof_col();
         for (size_t trow = 1; trow <= row; ++trow) {
             for (size_t tcol = 1; tcol <= row; ++tcol) {
-                if (inputMat(row, col) == 0) {
+                if (inputMat(row, col) < 0) {
                     return true;
                 }
             }
@@ -147,78 +146,92 @@ public:
 
         while (true) {
             std::cout << std::endl;
-            std::cout << "Input num of vertex (>=0) => ";
+            std::cout << "Input num of vertex (>0) => ";
 
             std::cin >> num_of_v;
 
-            if (num_of_v < 0) {
+            if (num_of_v <= 0) {
                 std::cout << std::endl;
-                std::cout << "Input num should >=0, please do it again. " << std::endl;
+                std::cout << "Input num should >0, please do it again. " << std::endl;
             } else {
                 break;
             }
         }
 
-        if (num_of_v != 0) {
-            initMat.reserve(num_of_v);
-            initRow.reserve(num_of_v);
+        initMat.reserve(num_of_v);
+        initRow.reserve(num_of_v);
 
+        std::cout << std::endl;
+        std::cout << "Input each element in the Adjacency Matrix => " << std::endl;
+
+        for (size_t row = 0; row < num_of_v; ++row) {
+            for (size_t col = 0; col < num_of_v; ++col) {
+                int tmp;
+                std::cin >> tmp;
+                initRow.emplace_back(tmp);
+            }
+            initMat.emplace_back(initRow);
+            initRow.clear();
+        }
+
+        TheMat          = new Tool::Matrix<int>(initMat); // cannot move it!
+        auto& TheMatRef = *TheMat;
+
+        if (if_any_less_than_zero(TheMatRef)) {
             std::cout << std::endl;
-            std::cout << "Input each element in the Adjacency Matrix => " << std::endl;
+            throw std::logic_error("There's element <0 in the Matrix. ");
+        }
 
-            for (size_t row = 0; row < num_of_v; ++row) {
-                for (size_t col = 0; col < num_of_v; ++col) {
-                    int tmp;
-                    std::cin >> tmp;
-                    initRow.emplace_back(tmp);
-                }
-                initMat.emplace_back(initRow);
-                initRow.clear();
-            }
+        bool if_need_to_confirm_type = false;
 
-            TheMat          = new Tool::Matrix<int>(std::move(initMat));
-            auto& TheMatRef = *TheMat;
-
-            if (if_any_less_than_zero(TheMatRef)) {
-                std::cout << std::endl;
-                throw std::logic_error("There's element <0 in the Matrix. ");
-            }
+        if (num_of_v != 1) {
             if (!Tool::Matrix<int>::
                     if_symmetric_of_main_diagonal(TheMatRef)) {
                 graph_type = Graph::Type::directed;
                 std::cout << std::endl;
                 std::cout << "Type of Graph is Automatically-Judged as {directed_graph} " << std::endl;
             } else {
-                std::cout << std::endl;
-                std::cout << "You need confirm the Type of Graph. " << std::endl;
-
-                std::cout << std::endl;
-                std::cout << R"(If you want a {directed_graph}, input "Y" or "y". )"
-                          << std::endl;
-                std::cout << R"(If you want a {undirected_graph}, input anything except Y/y. )"
-                          << std::endl;
-                std::cout << std::endl;
-                std::cout << "=> ";
-
-                std::string flag;
-                std::cin >> flag;
-
-                if (flag == "Y" || flag == "y") {
-                    graph_type = Graph::Type::directed;
-                    std::cout << std::endl;
-                    std::cout << "Type confirmed as {directed}. " << std::endl;
-                } else {
-                    graph_type = Graph::Type::undirected;
-                    std::cout << std::endl;
-                    std::cout << "Type confirmed as {undirected}. " << std::endl;
-                }
+                if_need_to_confirm_type = true;
             }
         } else {
-            graph_type = Graph::Type::undirected;
-            TheMat     = new Tool::Matrix<int>({ { 0 } });
-            initMat    = { { 0 } };
+            int val = initMat[0][0];
+            if (val % 2 != 0) {
+                graph_type = Graph::Type::directed;
+                std::cout << std::endl;
+                std::cout << "Type restricted as {directed}. " << std::endl;
+            } else if (val == 0) {
+                graph_type = Graph::Type::undirected;
+                std::cout << std::endl;
+                std::cout << "Trival Graph! Type judged as {undirected}. " << std::endl;
+            } else {
+                if_need_to_confirm_type = true;
+            }
+        }
+
+        if (if_need_to_confirm_type) {
             std::cout << std::endl;
-            std::cout << "Type of Graph is Automatically-Judged as {undirected_graph}" << std::endl;
+            std::cout << "You need confirm the Type of Graph. " << std::endl;
+
+            std::cout << std::endl;
+            std::cout << R"(If you want a {directed_graph}, input "Y" or "y". )"
+                      << std::endl;
+            std::cout << R"(If you want a {undirected_graph}, input anything except Y/y. )"
+                      << std::endl;
+            std::cout << std::endl;
+            std::cout << "=> ";
+
+            std::string flag;
+            std::cin >> flag;
+
+            if (flag == "Y" || flag == "y") {
+                graph_type = Graph::Type::directed;
+                std::cout << std::endl;
+                std::cout << "Type confirmed as {directed}. " << std::endl;
+            } else {
+                graph_type = Graph::Type::undirected;
+                std::cout << std::endl;
+                std::cout << "Type confirmed as {undirected}. " << std::endl;
+            }
         }
 
         Graph res(std::move(initMat), graph_type);
@@ -229,6 +242,8 @@ public:
         } else {
             std::cout << "Successfully created a {directed} graph" << std::endl;
         }
+
+        std::cout << std::endl;
 
         delete TheMat;
         return res;
