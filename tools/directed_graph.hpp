@@ -244,7 +244,7 @@ public:
     }
     static Tool::Matrix<int> return_undirected_matrix(
         directed_graph& input
-    ) { // will be used in Tarjan Algorithm
+    ) {
         Tool::Matrix<int> res        = *(input.DataMat);
         size_t            num_of_row = res.get_sizeof_row();
         size_t            num_of_col = res.get_sizeof_col();

@@ -27,17 +27,6 @@ void EulerTest_directed() {
         { 1, 1, 0, 0 },
     };
 
-    /// @brief @b Hierholzer_Fastest
-    auto H_fastest
-        = directed_graph::return_euler_circle_set_H_fastest(Nontrivial_Test);
-    for (auto&& vec : H_fastest) {
-        for (auto&& str : vec) {
-            std::cout << str;
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
     /// @brief @b Hierholzer_Purely_Self_Constructed
     auto H
         = directed_graph::return_euler_circle_set_H(Nontrivial_Test);
@@ -66,17 +55,6 @@ void EulerTest_directed() {
      */
 
     directed_graph Trivial_Test = { { 0 } };
-
-    /// @brief @b Hierholzer_Fastest
-    auto H_fastest_trivial
-        = directed_graph::return_euler_circle_set_H_fastest(Trivial_Test);
-    for (auto&& vec : H_fastest_trivial) {
-        for (auto&& str : vec) {
-            std::cout << str;
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
 
     /// @brief @b Hierholzer_Purely_Self_Constructed
     auto H_trivial
@@ -110,17 +88,6 @@ void EulerTest_directed() {
         { 0, 0, 1 },
         { 0, 0, 0 },
     };
-
-    /// @brief @b Hierholzer_Fastest
-    auto H_fastest_UnEuler
-        = directed_graph::return_euler_circle_set_H_fastest(UnEuler_Test);
-    for (auto&& vec : H_fastest_UnEuler) {
-        for (auto&& str : vec) {
-            std::cout << str;
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
 
     /// @brief @b Hierholzer_Purely_Self_Constructed
     auto H_UnEuler
