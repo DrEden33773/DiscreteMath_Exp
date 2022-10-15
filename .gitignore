@@ -5,6 +5,9 @@ build/
 # .vscode
 .vscode/
 
+# .vscodeCounter
+.VSCodeCounter/
+
 # personal doc
 latex_doc/
 
