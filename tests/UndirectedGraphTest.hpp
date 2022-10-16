@@ -15,6 +15,8 @@
 namespace Test {
 
 void UndirectedGraphTest() {
+    std::cout << std::endl;
+
     auto trivial_graph
         = undirected_graph::create_trivial();
 
@@ -24,7 +26,11 @@ void UndirectedGraphTest() {
     auto zero_graph_1
         = undirected_graph::create_zero();
 
-    assert(undirected_graph::is_same(zero_graph_1, trivial_graph));
+    if (undirected_graph::is_same(zero_graph_1, trivial_graph)) {
+        std::cout << "zero_graph_with_1_point is same as trivial_graph" << std::endl;
+    }
+
+    std::cout << std::endl;
 }
 
 } // namespace Test

@@ -172,7 +172,7 @@ public:
         undirected_graph res(std::move(initMat));
         return res;
     }
-    static constexpr bool is_same(
+    static bool is_same(
         const undirected_graph& lhs,
         const undirected_graph& rhs
     ) {

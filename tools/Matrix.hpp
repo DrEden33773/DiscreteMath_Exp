@@ -294,7 +294,7 @@ public:
         }
         return res;
     }
-    static constexpr bool A_eq_B(Matrix& A, Matrix& B) {
+    static bool A_eq_B(Matrix& A, Matrix& B) {
         if (!Matrix::assignable(A, B)) {
             // throw std::logic_error("Matrix {A} and {B} is incomparable!");
             return false; // we could still assert that two incomparable matrix is not equal
@@ -308,7 +308,7 @@ public:
         }
         return true;
     }
-    static constexpr bool A_eq_B(Matrix* A, Matrix* B) {
+    static bool A_eq_B(Matrix* A, Matrix* B) {
         Matrix<decltype(A->TypeIdentifier)>& MatA = (*A);
         Matrix<decltype(B->TypeIdentifier)>& MatB = (*B);
         if (!Matrix::assignable(MatA, MatB)) {

@@ -129,7 +129,7 @@ public:
         directed_graph res(std::move(initMat));
         return res; // call delete func here
     }
-    static constexpr bool is_same(
+    static bool is_same(
         const directed_graph& lhs,
         const directed_graph& rhs
     ) {
