@@ -149,13 +149,16 @@ public:
     GraphFactory()  = delete;
     ~GraphFactory() = default;
     static Graph CreateGraph() {
+        /// @brief @b graph_info
         int         num_of_v   = 0;
         Graph::Type graph_type = Graph::Type::directed;
 
+        /// @brief @b data
         Tool::Matrix<int>*            TheMat = nullptr;
         std::vector<std::vector<int>> initMat;
         std::vector<int>              initRow;
 
+        /// @brief @p input @b vertex
         while (true) {
             std::cout << std::endl;
             std::cout << "Input num of vertex (>0) => ";
@@ -173,9 +176,9 @@ public:
         initMat.reserve(num_of_v);
         initRow.reserve(num_of_v);
 
+        /// @brief @p input @b matrix
         std::cout << std::endl;
         std::cout << "Input each element in the Adjacency Matrix => " << std::endl;
-
         for (size_t row = 0; row < num_of_v; ++row) {
             for (size_t col = 0; col < num_of_v; ++col) {
                 int tmp;
@@ -189,6 +192,7 @@ public:
         TheMat          = new Tool::Matrix<int>(initMat); // cannot move it!
         auto& TheMatRef = *TheMat;
 
+        /// @brief @e logic_error_check_point
         if (if_any_less_than_zero(TheMatRef)) {
             std::cout << std::endl;
             throw std::logic_error("There's element <0 in the Matrix. ");
@@ -196,6 +200,7 @@ public:
 
         bool if_need_to_confirm_type = false;
 
+        /// @brief @p judge/restrict @b type
         if (num_of_v != 1) {
             if (!Tool::Matrix<int>::
                     if_symmetric_of_main_diagonal(TheMatRef)) {
@@ -214,12 +219,13 @@ public:
             } else if (val == 0) {
                 graph_type = Graph::Type::undirected;
                 std::cout << std::endl;
-                std::cout << "Trival Graph! Type judged as {undirected}. " << std::endl;
+                std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
             } else {
                 if_need_to_confirm_type = true;
             }
         }
 
+        /// @brief @p confirm @b type
         if (if_need_to_confirm_type) {
             std::cout << std::endl;
             std::cout << "You need confirm the Type of Graph. " << std::endl;
@@ -246,8 +252,10 @@ public:
             }
         }
 
+        /// @brief @p construct
         Graph res(std::move(initMat), graph_type);
 
+        /// @brief @p show @b success_info_with_type
         std::cout << std::endl;
         if (graph_type == Graph::Type::undirected) {
             std::cout << "Successfully created a {undirected} graph" << std::endl;
@@ -255,9 +263,10 @@ public:
             std::cout << "Successfully created a {directed} graph" << std::endl;
         }
 
-        std::cout << std::endl;
-
+        /// @brief @p delete @b unused_mat
         delete TheMat;
+
+        std::cout << std::endl;
         return res;
     }
 };
