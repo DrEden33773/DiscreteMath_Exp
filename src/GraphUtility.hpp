@@ -27,10 +27,10 @@
 #include "../tools/directed_graph.hpp"
 #include "../tools/undirected_graph.hpp"
 
-class Graph;
+class GraphManager;
 class GraphFactory;
 
-class Graph {
+class GraphManager {
     friend class GraphFactory;
 
     enum class Type : unsigned short {
@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    Graph(std::vector<std::vector<int>>&& initMat, Type type_of_graph) {
+    GraphManager(std::vector<std::vector<int>>&& initMat, Type type_of_graph) {
         using origin = std::vector<std::vector<int>>;
         graph_type   = type_of_graph;
         if (graph_type == Type::undirected) {
@@ -105,6 +105,9 @@ public:
     }
 
     void show_euler_circle_set_H() {
+        std::cout << "Hierholzer Algorithm => " << std::endl;
+        std::cout << std::endl;
+
         std::vector<std::string> output;
         output = this->return_euler_circle_set_H();
 
@@ -118,6 +121,9 @@ public:
     }
 
     void show_euler_circle_set_F() {
+        std::cout << "Fleury Algorithm (With Matrix Calculation) => " << std::endl;
+        std::cout << std::endl;
+
         std::vector<std::string> output;
         output = this->return_euler_circle_set_F();
 
@@ -148,10 +154,10 @@ class GraphFactory {
 public:
     GraphFactory()  = delete;
     ~GraphFactory() = default;
-    static Graph CreateGraph() {
+    static GraphManager CreateGraph() {
         /// @brief @b graph_info
-        int         num_of_v   = 0;
-        Graph::Type graph_type = Graph::Type::directed;
+        int                num_of_v   = 0;
+        GraphManager::Type graph_type = GraphManager::Type::directed;
 
         /// @brief @b data
         Tool::Matrix<int>*            TheMat = nullptr;
@@ -204,7 +210,7 @@ public:
         if (num_of_v != 1) {
             if (!Tool::Matrix<int>::
                     if_symmetric_of_main_diagonal(TheMatRef)) {
-                graph_type = Graph::Type::directed;
+                graph_type = GraphManager::Type::directed;
                 std::cout << std::endl;
                 std::cout << "Type of Graph is restricted as {directed_graph} " << std::endl;
             } else {
@@ -213,11 +219,11 @@ public:
         } else {
             int val = initMat[0][0];
             if (val % 2 != 0) {
-                graph_type = Graph::Type::directed;
+                graph_type = GraphManager::Type::directed;
                 std::cout << std::endl;
                 std::cout << "Type restricted as {directed}. " << std::endl;
             } else if (val == 0) {
-                graph_type = Graph::Type::undirected;
+                graph_type = GraphManager::Type::undirected;
                 std::cout << std::endl;
                 std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
             } else {
@@ -242,22 +248,22 @@ public:
             std::cin >> flag;
 
             if (flag == "Y" || flag == "y") {
-                graph_type = Graph::Type::directed;
+                graph_type = GraphManager::Type::directed;
                 std::cout << std::endl;
                 std::cout << "Type confirmed as {directed}. " << std::endl;
             } else {
-                graph_type = Graph::Type::undirected;
+                graph_type = GraphManager::Type::undirected;
                 std::cout << std::endl;
                 std::cout << "Type confirmed as {undirected}. " << std::endl;
             }
         }
 
         /// @brief @p construct
-        Graph res(std::move(initMat), graph_type);
+        GraphManager res(std::move(initMat), graph_type);
 
         /// @brief @p show @b success_info_with_type
         std::cout << std::endl;
-        if (graph_type == Graph::Type::undirected) {
+        if (graph_type == GraphManager::Type::undirected) {
             std::cout << "Successfully created a {undirected} graph" << std::endl;
         } else {
             std::cout << "Successfully created a {directed} graph" << std::endl;
