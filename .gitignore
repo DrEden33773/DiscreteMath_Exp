@@ -8,13 +8,13 @@ build/
 # .vscodeCounter
 .VSCodeCounter/
 
-# personal doc
-latex_doc/
-
 # MacOS Cache
 .DS_Store
 
 # Report
 REPORT.md
+离散数学实验报告_162110335_王文翰.pdf
+离散数学实验报告_162110335_王文翰.md
+离散数学实验报告_162110335_王文翰.html
 
 
