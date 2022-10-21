@@ -442,7 +442,7 @@ public:
         SizeOf_Row    = initMat.SizeOf_Row;
         SizeOf_Column = initMat.SizeOf_Column;
         buildZeroMat(SizeOf_Row, SizeOf_Column);
-        // 3. write to matrix
+        // 3. move to matrix
         for (int row = 1; row <= SizeOf_Row; ++row) {
             for (int col = 1; col <= SizeOf_Column; ++col) {
                 Data[row - 1][col - 1] = initMat(row, col);
