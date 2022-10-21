@@ -214,20 +214,18 @@ public:
                 std::cout << std::endl;
                 std::cout << "Type of Graph is restricted as {directed_graph} " << std::endl;
             } else {
-                if_need_to_confirm_type = true;
-            }
-        } else {
-            int val = initMat[0][0];
-            if (val % 2 != 0) {
-                graph_type = GraphManager::Type::directed;
-                std::cout << std::endl;
-                std::cout << "Type restricted as {directed}. " << std::endl;
-            } else if (val == 0) {
-                graph_type = GraphManager::Type::undirected;
-                std::cout << std::endl;
-                std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
-            } else {
-                if_need_to_confirm_type = true;
+                int val = initMat[0][0];
+                if (val % 2 != 0) {
+                    graph_type = GraphManager::Type::directed;
+                    std::cout << std::endl;
+                    std::cout << "Type restricted as {directed}. " << std::endl;
+                } else if (val == 0) {
+                    graph_type = GraphManager::Type::undirected;
+                    std::cout << std::endl;
+                    std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
+                } else {
+                    if_need_to_confirm_type = true;
+                }
             }
         }
 
