@@ -83,6 +83,7 @@ protected:
     }
 
     /// @brief methods about iterating of vertex and edge
+
     /**
      * @brief return first iterable vertex
      *
