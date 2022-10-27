@@ -12,6 +12,7 @@
                 @b if the @e Matrix is @b Non_Symmetrical => @p Restricted_as @e directed
                 @b if the @e Matrix is @b {{0}} => @p Restricted_as @e Undirected
                 @b if the @e Matrix is @b {{2n+1}} => @p Restricted_as @e directed
+                @b if the @e Matrix has @b 2n+1 @b on_major_diagonal => @p Restricted_as @e directed
                 @b if the @e Matrix is @b Axially_Symmetrical => @p Judged_as @e Undirected
                     @b if you've @p designated the @e type => @p Abandon_Judgement
 
@@ -157,7 +158,8 @@ public:
     static GraphManager CreateGraph() {
         /// @brief @b graph_info
         int                num_of_v   = 0;
-        GraphManager::Type graph_type = GraphManager::Type::directed;
+        GraphManager::Type graph_type = GraphManager::Type::undirected;
+        /* note that => graph_type's default value should be `undirected` */
 
         /// @brief @b data
         Tool::Matrix<int>*            TheMat = nullptr;
@@ -214,18 +216,30 @@ public:
                 std::cout << std::endl;
                 std::cout << "Type of Graph is restricted as {directed_graph} " << std::endl;
             } else {
-                int val = initMat[0][0];
-                if (val % 2 != 0) {
-                    graph_type = GraphManager::Type::directed;
-                    std::cout << std::endl;
-                    std::cout << "Type restricted as {directed}. " << std::endl;
-                } else if (val == 0) {
-                    graph_type = GraphManager::Type::undirected;
-                    std::cout << std::endl;
-                    std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
-                } else {
+                bool if_break = false;
+                for (int index = 0; index < num_of_v; ++index) {
+                    if (initMat[index][index] % 2 != 0) {
+                        graph_type = GraphManager::Type::directed;
+                        std::cout << std::endl;
+                        std::cout << "Type of Graph is restricted as {directed_graph} " << std::endl;
+                        if_break = true;
+                        break;
+                    }
+                }
+                if (!if_break) {
                     if_need_to_confirm_type = true;
                 }
+            }
+        } else {
+            int val = initMat[0][0];
+            if (val % 2 != 0) {
+                graph_type = GraphManager::Type::directed;
+                std::cout << std::endl;
+                std::cout << "Type restricted as {directed}. " << std::endl;
+            } else if (val == 0) {
+                graph_type = GraphManager::Type::undirected;
+                std::cout << std::endl;
+                std::cout << "Trivial Graph! Type judged as {undirected}. " << std::endl;
             }
         }
 
