@@ -1,7 +1,7 @@
 /**
  * @file general_graph_tool_set.hpp
  * @author Eden (edwardwang33773@gmail.com)
- * @brief A set tools usded in undirected and directed graph
+ * @brief A set tools used in undirected and directed graph
  * @version 0.1
  * @date 2022-10-16
  *
