@@ -7,7 +7,7 @@
 int main(int argc, char** argv) {
     // Tests below could be recalled!
 
-    // Test::MatrixTest();
+    Test::MatrixTest();
     // Test::UndirectedGraphTest();
     // Test::EulerTest_undirected();
     // Test::EulerTest_directed();
