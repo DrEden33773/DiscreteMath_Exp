@@ -40,7 +40,7 @@ class GraphManager {
     };
     directed_graph*   directed   = nullptr;
     undirected_graph* undirected = nullptr;
-    Type              graph_type = Type::directed; // default as directed
+    Type              graph_type = Type::undirected; // default as undirected
 
 public:
     std::string return_graph_type() {
@@ -51,6 +51,14 @@ public:
             res = "undirected_graph";
         }
         return res;
+    }
+    ~GraphManager() {
+        if (directed) {
+            delete directed;
+        }
+        if (undirected) {
+            delete undirected;
+        }
     }
 
 private:
